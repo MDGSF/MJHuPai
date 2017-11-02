@@ -269,9 +269,56 @@ Sub SplitNum(long long iNum, int i)
     return sub;
 }
 
-void CalcMainSub(Sub MainSub, vector<Sub> & subVec)
+void CalcMainSub(long long iNum, Sub MainSub, vector<Sub> & subVec)
 {
+    long long iRightBitsNum = iGetNumBits(MainSub.b);
 
+    long long iNewLeft = MainSub.a / 100;
+    long long iNewRight = 0;
+    if (MainSub.b > 100)
+    {
+        iNewRight = MainSub.b % long long(pow(10, iRightBitsNum - 2));
+    }
+
+    long long iLeft1 = MainSub.a % 10;
+    long long iLeft2 = MainSub.a / 10 % 10;
+
+    long long iRight1 = MainSub.b / (pow(10, iRightBitsNum - 1));
+    long long iRight2 = 0;
+    if (iRightBitsNum - 2 >= 0)
+    {
+        iRight2 = (long long)(MainSub.b / (pow(10, iRightBitsNum - 2))) % 10;
+    }
+
+    for (int i = 0; i <= iLeft1; i++)
+    {
+        for (int j = 0; j <= iLeft2; j++)
+        {
+            Sub sub;
+            sub.a = iNewLeft * 100 + i * 10 + j;
+            sub.b = (iLeft1 - i)*pow(10, iRightBitsNum + 1) + (iLeft2 - j) * pow(10, iRightBitsNum) + MainSub.b;
+
+            if (sub.a > 0 && sub.a < iNum && sub.b > 0 && sub.b < iNum)
+            {
+                subVec.push_back(sub);
+            }
+        }
+    }
+
+    for (int i = 0; i <= iRight1; i++)
+    {
+        for (int j = 0; j <= iRight2; j++)
+        {
+            Sub sub;
+            sub.a = MainSub.a * 100 + (iRight1 - i) * 10 + (iRight2 - j);
+            sub.b = i*pow(10, iRightBitsNum - 1) +  j * pow(10, iRightBitsNum - 2) + iNewRight;
+
+            if (sub.a > 0 && sub.a < iNum && sub.b > 0 && sub.b < iNum)
+            {
+                subVec.push_back(sub);
+            }
+        }
+    }
 }
 
 void GetNumSub(long long iNum, vector<Sub> & subVec)
@@ -282,7 +329,7 @@ void GetNumSub(long long iNum, vector<Sub> & subVec)
         Sub MainSub = SplitNum(iNum, i);
         subVec.push_back(MainSub);
 
-        CalcMainSub(MainSub, subVec);
+        CalcMainSub(iNum, MainSub, subVec);
     }
 }
 
@@ -318,7 +365,8 @@ long long GetMinLaiZi(long long iNum)
 
 void vTest2()
 {
-
+    long long lRet = GetMinLaiZi(22122);
+    printf("lRet = %lld\n", lRet);
 }
 
 
@@ -328,6 +376,7 @@ int main()
     //vGetNext(1030, 4, 2);
 
     vInit();
+    vTest2();
 
     return 0;
 }
