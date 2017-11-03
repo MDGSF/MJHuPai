@@ -17,7 +17,7 @@
     <ClCompile Include="..\qipai_mjlib_split\split.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MJHuPai_split_HasLaiZi_3\hu.cpp">
+    <ClCompile Include="..\demo\hu.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -25,7 +25,7 @@
     <ClInclude Include="..\qipai_mjlib_split\split.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\MJHuPai_split_HasLaiZi_3\hu.h">
+    <ClInclude Include="..\demo\hu.h">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>

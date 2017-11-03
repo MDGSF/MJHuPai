@@ -1,3 +1,6 @@
+
+#include <windows.h>
+#include <ctime>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -66,14 +69,49 @@ void vShowHandCards(Card aucHandCards[MAX_HANDCARD_NUM], Card ucLaizi)
 
 void vTest1()
 {
+    srand(unsigned(time(0)));
+    Card m_aucSysCards[CARD_MAX_COUNT + 1] = { 0 };
+
+    strcat((char *)m_aucSysCards, (const char *)g_CardWangData);
+    strcat((char *)m_aucSysCards, (const char *)g_CardTiaoData);
+    strcat((char *)m_aucSysCards, (const char *)g_CardTongData);
+    strcat((char *)m_aucSysCards, (const char *)g_CardFengData);
+    strcat((char *)m_aucSysCards, (const char *)g_CardJianData);
+
+    int m_ucSysCardsNum = strlen((char *)m_aucSysCards);
+
+    CLaiZiHu oLaiZiHu;
+
+    DWORD dwStartTime = GetTickCount();
+    for (int i = 0; i < 1000000; i++)
+    {
+        m_vRandomArray(m_aucSysCards, m_ucSysCardsNum);
+        Card aucHandCards[MAX_HANDCARD_NUM] = { 0 };
+        memcpy(aucHandCards, m_aucSysCards, MAX_HANDCARD_NUM);
+        Card ucLaizi = aucHandCards[0];
+        bool bMyCanHu = oLaiZiHu.bHu(aucHandCards, MAX_HANDCARD_NUM, ucLaizi);
+    }
+    DWORD dwEndTime = GetTickCount();
+    printf("dwStartTime = %d, dwEndTime = %d, elps = %d\n", dwStartTime, dwEndTime, dwEndTime - dwStartTime);
+}
+
+void vTest2()
+{
+    CLaiZiHu oLaiZiHu;
     for (int i = 0; i < 10000000; i++)
     {
         Card aucHandCards[MAX_HANDCARD_NUM] = { 0 };
         Card ucLaizi = 0;
         vGenRandHandCards(aucHandCards, ucLaizi);
         //printf("i = %d\n", i);
-        bool bMyCanHu = bHu(aucHandCards, ucLaizi);
+        bool bMyCanHu = oLaiZiHu.bHu(aucHandCards, MAX_HANDCARD_NUM, ucLaizi);
         bool bQiPaiCanHu = split::bHuHasLaizi(aucHandCards, ucLaizi);
+
+        if (i % 100000 == 0)
+        {
+            printf("### i = %d\n", i);
+        }
+
         if (bMyCanHu != bQiPaiCanHu)
         {
             static int iDiffCount = 0;
@@ -84,7 +122,7 @@ void vTest1()
             {
                 getchar();getchar();getchar();getchar();
             }
-            
+
         }
     }
 }
@@ -93,6 +131,7 @@ int main()
 {
     printf("Hello world\n");
 
+    //vTest2();
     vTest1();
 
     getchar();getchar();getchar();getchar();
