@@ -67,6 +67,32 @@ void vShowHandCards(Card aucHandCards[MAX_HANDCARD_NUM], Card ucLaizi)
     printf("]]]]  ucLaizi = %02x\n", ucLaizi);
 }
 
+void vTest0()
+{
+    srand(unsigned(time(0)));
+    Card m_aucSysCards[CARD_MAX_COUNT + 1] = { 0 };
+
+    strcat((char *)m_aucSysCards, (const char *)g_CardWangData);
+    strcat((char *)m_aucSysCards, (const char *)g_CardTiaoData);
+    strcat((char *)m_aucSysCards, (const char *)g_CardTongData);
+    strcat((char *)m_aucSysCards, (const char *)g_CardFengData);
+    strcat((char *)m_aucSysCards, (const char *)g_CardJianData);
+
+    int m_ucSysCardsNum = strlen((char *)m_aucSysCards);
+
+    DWORD dwStartTime = GetTickCount();
+    printf("dwStartTime = %d\n", dwStartTime);
+    for (int i = 0; i < 1000000; i++)
+    {
+        m_vRandomArray(m_aucSysCards, m_ucSysCardsNum);
+        Card aucHandCards[MAX_HANDCARD_NUM] = { 0 };
+        memcpy(aucHandCards, m_aucSysCards, MAX_HANDCARD_NUM);
+        Card ucLaizi = aucHandCards[0];
+    }
+    DWORD dwEndTime = GetTickCount();
+    printf("dwStartTime = %d, dwEndTime = %d, elps = %d\n", dwStartTime, dwEndTime, dwEndTime - dwStartTime);
+}
+
 void vTest1()
 {
     srand(unsigned(time(0)));
@@ -83,6 +109,7 @@ void vTest1()
     CLaiZiHu oLaiZiHu;
 
     DWORD dwStartTime = GetTickCount();
+    printf("dwStartTime = %d\n", dwStartTime);
     for (int i = 0; i < 1000000; i++)
     {
         m_vRandomArray(m_aucSysCards, m_ucSysCardsNum);
@@ -90,6 +117,10 @@ void vTest1()
         memcpy(aucHandCards, m_aucSysCards, MAX_HANDCARD_NUM);
         Card ucLaizi = aucHandCards[0];
         bool bMyCanHu = oLaiZiHu.bHu(aucHandCards, MAX_HANDCARD_NUM, ucLaizi);
+        if (i % 100000 == 0)
+        {
+            printf("curTime = %d\n", GetTickCount());
+        }
     }
     DWORD dwEndTime = GetTickCount();
     printf("dwStartTime = %d, dwEndTime = %d, elps = %d\n", dwStartTime, dwEndTime, dwEndTime - dwStartTime);
@@ -127,12 +158,45 @@ void vTest2()
     }
 }
 
+void vTest3()
+{
+    srand(unsigned(time(0)));
+    Card m_aucSysCards[CARD_MAX_COUNT + 1] = { 0 };
+
+    strcat((char *)m_aucSysCards, (const char *)g_CardWangData);
+    strcat((char *)m_aucSysCards, (const char *)g_CardTiaoData);
+    strcat((char *)m_aucSysCards, (const char *)g_CardTongData);
+    strcat((char *)m_aucSysCards, (const char *)g_CardFengData);
+    strcat((char *)m_aucSysCards, (const char *)g_CardJianData);
+
+    int m_ucSysCardsNum = strlen((char *)m_aucSysCards);
+
+    DWORD dwStartTime = GetTickCount();
+    printf("dwStartTime = %d\n", dwStartTime);
+    for (int i = 0; i < 1000000; i++)
+    {
+        m_vRandomArray(m_aucSysCards, m_ucSysCardsNum);
+        Card aucHandCards[MAX_HANDCARD_NUM] = { 0 };
+        memcpy(aucHandCards, m_aucSysCards, MAX_HANDCARD_NUM);
+        Card ucLaizi = aucHandCards[0];
+        bool bQiPaiCanHu = split::bHuHasLaizi(aucHandCards, ucLaizi);
+        if (i % 100000 == 0)
+        {
+            printf("curTime = %d\n", GetTickCount());
+        }
+    }
+    DWORD dwEndTime = GetTickCount();
+    printf("dwStartTime = %d, dwEndTime = %d, elps = %d\n", dwStartTime, dwEndTime, dwEndTime - dwStartTime);
+}
+
+
 int main()
 {
     printf("Hello world\n");
 
     //vTest2();
-    vTest1();
+    //vTest1();
+    vTest3();
 
     getchar();getchar();getchar();getchar();
 

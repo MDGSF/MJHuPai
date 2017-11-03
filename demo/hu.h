@@ -10,29 +10,7 @@
 
 using namespace std;
 
-struct Sub {
-    long long a;
-    long long b;
-
-    long long arr[14];
-    int arrLen;
-
-    long long brr[14];
-    int brrLen;
-
-    Sub()
-    {
-        a = 0;
-        memset(arr, 0, sizeof(arr));
-        arrLen = 0;
-
-        b = 0;
-        memset(brr, 0, sizeof(brr));
-        brrLen = 0;
-    }
-};
-
-
+struct Sub;
 
 class CLaiZiHu
 {
@@ -42,7 +20,7 @@ public:
 
     bool bHu(Card aucHandCards[MAX_HANDCARD_NUM], int iHandCardsLen, Card ucLaiZi);
 
-    //要保证输入的只有012
+    //要保证输入的只有01234
     long long GetMinLaiZi(long long iNum);
 
 private:
@@ -76,12 +54,17 @@ private:
 
     bool bSplitWithTwoBlank(long long iNum, vector<long long> & setNum);
 
-    void vTrimNum(long long & iNum);
+    /*
+    @brief: 删除iNum最低位的零
+    */
+    void vTrimNumZero(long long & iNum);
 
     bool bTongHuaSeCanBeKeZi(int iCardsNum[MAX_CARD_ARRAY_SIZE], int iStartIndex, int iEndIndex, int & iNeedLaiZiNum);
 
     void vTest2();
 
+    //<handcards, need LaiZi Num>
     map<long long, long long> handCardsMap;
+
     vector< set<long long> > vec;
 };
