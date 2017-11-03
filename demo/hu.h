@@ -23,6 +23,8 @@ public:
     //要保证输入的只有01234
     long long GetMinLaiZi(long long iNum);
 
+    long long GetMinLaiZiNoTwoBlank(long long iNum);
+
 private:
     void vGetJiang(int iCardsNum[MAX_CARD_ARRAY_SIZE], Card aucJiang[MAX_HANDCARD_NUM], int & riJiangNum);
 

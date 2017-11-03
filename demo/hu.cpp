@@ -450,6 +450,25 @@ long long CLaiZiHu::GetMinLaiZi(long long iNum)
         return 0;
     }
 
+    vector<long long> setNum;
+    bool bRet = bSplitWithTwoBlank(iNum, setNum);
+    if (bRet)
+    {
+        int iMin = 0;
+        vector<long long>::iterator iter = setNum.begin();
+        while (iter != setNum.end())
+        {
+            iMin += GetMinLaiZiNoTwoBlank(*iter);
+            ++iter;
+        }
+        return iMin;
+    }
+
+    return GetMinLaiZiNoTwoBlank(iNum);
+}
+
+long long CLaiZiHu::GetMinLaiZiNoTwoBlank(long long iNum)
+{
     long long llSourceNum = iNum;
 
     vTrimNumZero(iNum);
@@ -460,44 +479,6 @@ long long CLaiZiHu::GetMinLaiZi(long long iNum)
         return iterMap->second;
     }
 
-    vector<long long> setNum;
-    bool bRet = bSplitWithTwoBlank(iNum, setNum);
-    if (bRet)
-    {
-        int iMin = 0;
-        vector<long long>::iterator iter = setNum.begin();
-        while (iter != setNum.end())
-        {
-            iMin += GetMinLaiZi(*iter);
-            ++iter;
-        }
-        return iMin;
-    }
-
-    int iNumBits = iGetNumBits(iNum);
-    if (iNumBits <= 3)
-    {
-        long long iNewNum = 0;
-        long long base = 1;
-        while (iNum > 0)
-        {
-            int iCurBit = iNum % 10;
-            iNum /= 10;
-
-            if (iCurBit > 2)
-            {
-                iCurBit -= 3;
-            }
-
-            iNewNum = iNewNum + iCurBit * base;
-            base *= 10;
-        }
-
-        iNum = iNewNum;
-
-        return GetMinLaiZi(iNum);
-    }
-
     vector<Sub> subVec;
     GetNumSub(iNum, subVec);
     long long iMin = 999999;
@@ -506,7 +487,7 @@ long long CLaiZiHu::GetMinLaiZi(long long iNum)
     {
         Sub & sub = *iterSubVec;
 
-        long long iLaiZi = GetMinLaiZi(sub.a) + GetMinLaiZi(sub.b);
+        long long iLaiZi = GetMinLaiZiNoTwoBlank(sub.a) + GetMinLaiZiNoTwoBlank(sub.b);
         if (iLaiZi < iMin)
         {
             iMin = iLaiZi;

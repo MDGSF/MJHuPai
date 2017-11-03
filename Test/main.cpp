@@ -195,8 +195,8 @@ int main()
     printf("Hello world\n");
 
     //vTest2();
-    //vTest1();
-    vTest3();
+    vTest1();
+    //vTest3();
 
     getchar();getchar();getchar();getchar();
 
