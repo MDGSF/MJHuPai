@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"jian/mj"
+
+	"github.com/MDGSF/MJHuPai/Go/mj"
 )
 
 const LaiZiNum = 9
