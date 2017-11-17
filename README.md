@@ -1,45 +1,24 @@
 # 麻将胡牌算法实现
 
-## MJHuPai_split_noLaiZi
+## C++/MJHuPai_split_noLaiZi
 
 麻将通用胡牌算法实现。(不包含赖子)
 
-## MJHuPai_split_HasLaiZi
+## C++/demo
 
-麻将通用胡牌算法实现。(包含一个赖子)
+麻将通用胡牌算法实现。(包含赖子)
 
-两张赖子可以做将，但是一张赖子和其他牌不能做将。
-
-万条筒风箭都可以是顺子和刻子。
-
-## MJHuPai_split_HasLaiZi_2
-
-麻将通用胡牌算法实现。(包含一个赖子)
-
-两张赖子可以做将，但是一张赖子和其他牌不能做将。
-
-万条筒都可以是顺子和刻子。
-
-风箭只可以是刻子，不能作为顺子。
-
-## MJHuPai_split_HasLaiZi_3
-
-麻将通用胡牌算法实现。(包含一个赖子)
-
-两张赖子可以做将，一张赖子和其他一张牌也可以做将。
-
-万条筒都可以是顺子和刻子。
-
-风箭只可以是刻子，不能作为顺子。
-
-## qipai_mjlib_split
+## C++/qipai_mjlib_split
 
 取自：https://github.com/yuanfengyun/qipai.git
 
-## public 
+## C++/public 
 
 麻将子通用定义
 
+## Go
+
+麻将通用胡牌算法实现。(https://github.com/yuanfengyun/qipai.git)
 
 
 # 麻将基础
@@ -64,8 +43,3 @@
 #### 二. 花牌 合计8张
 
 1. 春、夏、秋、冬、梅、兰、竹、菊
-
-
-## 基础规则
-
-1. 手牌最多14张。
