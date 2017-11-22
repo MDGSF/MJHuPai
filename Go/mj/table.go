@@ -22,13 +22,13 @@ func NewTable() *Table {
 	return table
 }
 
-func (table *Table) IsInTable(num int) bool {
+func (table *Table) IsInTable(num int) (int, bool) {
 	for i := 0; i < LaiZiNum; i++ {
 		if table.IsInTableMap(num, i) {
-			return true
+			return i, true
 		}
 	}
-	return false
+	return 0, false
 }
 
 func (table *Table) IsInTableMap(num int, iLaiZiNum int) bool {

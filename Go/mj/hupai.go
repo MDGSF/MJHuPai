@@ -11,6 +11,129 @@ func init() {
 	tableMgr.Load("../genTable/")
 }
 
+func CanHuWithLaiZi(handCards []Card, laizi []Card) bool {
+
+	if !IsValidHandCards(handCards) {
+		return false
+	}
+
+	laiziNum := 0
+	var slots [MAX_CARD_ARRAY_SIZE]Card
+	for _, c := range handCards {
+		if isLaizi(c, laizi) {
+			laiziNum++
+		} else {
+			slots[c]++
+		}
+	}
+
+	var XuShu []int
+	if getWan(slots) > 0 {
+		XuShu = append(XuShu, getWan(slots))
+	}
+	if getTiao(slots) > 0 {
+		XuShu = append(XuShu, getTiao(slots))
+	}
+	if getTong(slots) > 0 {
+		XuShu = append(XuShu, getTong(slots))
+	}
+
+	var Zi []int
+	if getFeng(slots) > 0 {
+		Zi = append(Zi, getFeng(slots))
+	}
+	if getJian(slots) > 0 {
+		Zi = append(Zi, getJian(slots))
+	}
+
+	for i, iNum := range XuShu {
+		success := true
+		hasLaiZiNum := laiziNum
+		needLaiZiNum, ok := tableMgr.TableXuShuWithEye.IsInTable(iNum)
+		if !ok || needLaiZiNum > hasLaiZiNum {
+			continue
+		}
+		hasLaiZiNum -= needLaiZiNum
+
+		for j, jNum := range XuShu {
+			if i == j {
+				continue
+			}
+			needLaiZiNum, ok := tableMgr.TableXuShu.IsInTable(jNum)
+			if !ok || needLaiZiNum > hasLaiZiNum {
+				success = false
+				break
+			}
+			hasLaiZiNum -= needLaiZiNum
+		}
+		if !success {
+			continue
+		}
+
+		for _, num := range Zi {
+			needLaiZiNum, ok := tableMgr.TableZi.IsInTable(num)
+			if !ok || needLaiZiNum > hasLaiZiNum {
+				success = false
+				break
+			}
+		}
+		if !success {
+			continue
+		}
+
+		return true
+	}
+
+	for i, iNum := range Zi {
+		success := true
+		hasLaiZiNum := laiziNum
+		needLaiZiNum, ok := tableMgr.TableZiWithEye.IsInTable(iNum)
+		if !ok || needLaiZiNum > hasLaiZiNum {
+			continue
+		}
+		hasLaiZiNum -= needLaiZiNum
+
+		for j, jNum := range Zi {
+			if i == j {
+				continue
+			}
+			needLaiZiNum, ok := tableMgr.TableZi.IsInTable(jNum)
+			if !ok || needLaiZiNum > hasLaiZiNum {
+				success = false
+				break
+			}
+			hasLaiZiNum -= needLaiZiNum
+		}
+		if !success {
+			continue
+		}
+
+		for _, num := range XuShu {
+			needLaiZiNum, ok := tableMgr.TableXuShu.IsInTable(num)
+			if !ok || needLaiZiNum > hasLaiZiNum {
+				success = false
+				break
+			}
+		}
+		if !success {
+			continue
+		}
+
+		return true
+	}
+
+	return false
+}
+
+func isLaizi(c Card, LaiZiArr []Card) bool {
+	for _, laizi := range LaiZiArr {
+		if c == laizi {
+			return true
+		}
+	}
+	return false
+}
+
 func CanHu(handCards []Card) bool {
 
 	if !IsValidHandCards(handCards) {

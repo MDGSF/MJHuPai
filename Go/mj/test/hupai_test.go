@@ -1,14 +1,22 @@
 package main
 
 import (
+	"jian/mj"
 	"testing"
-
-	"github.com/MDGSF/MJHuPai/Go/mj"
 )
 
 func Test1(t *testing.T) {
 	handCards := []mj.Card{0x43, 0x43, 0x01, 0x02, 0x03}
 	if !mj.CanHu(handCards) {
+		mj.ShowHandCards(handCards)
+		t.Error("CanHu failed.")
+	}
+}
+
+func TestLaiZi(t *testing.T) {
+	handCards := []mj.Card{0x43, 0x43, 0x01, 0x02, 0x03}
+	laizi := []mj.Card{0x11}
+	if !mj.CanHuWithLaiZi(handCards, laizi) {
 		mj.ShowHandCards(handCards)
 		t.Error("CanHu failed.")
 	}
@@ -306,6 +314,90 @@ func TestOneJiangWithFourPu(t *testing.T) {
 							mj.ShowHandCards(handCards4)
 							t.Error("CanHu failed.")
 						}
+					}
+
+				}
+
+			}
+
+		}
+	}
+
+	t.Log("count = ", count)
+}
+
+func TestLaiZiOneJiangWithFourPu(t *testing.T) {
+
+	count := 0
+	t.Log("count = ", count)
+
+	jiangChan := make(chan mj.Card)
+	go genJiang(jiangChan)
+	for jiang := range jiangChan {
+
+		handCards := []mj.Card{}
+		handCards = append(handCards, jiang)
+		handCards = append(handCards, jiang)
+
+		onePuZiChan := make(chan PuZi)
+		go genPuZi(onePuZiChan)
+		for one := range onePuZiChan {
+
+			var handCards1 = handCards
+			handCards1 = append(handCards1, one.PuZi[0])
+			handCards1 = append(handCards1, one.PuZi[1])
+			handCards1 = append(handCards1, one.PuZi[2])
+			if !mj.IsValidHandCards(handCards1) {
+				continue
+			}
+
+			twoPuZiChan := make(chan PuZi)
+			go genPuZi(twoPuZiChan)
+			for two := range twoPuZiChan {
+
+				var handCards2 = handCards1
+				handCards2 = append(handCards2, two.PuZi[0])
+				handCards2 = append(handCards2, two.PuZi[1])
+				handCards2 = append(handCards2, two.PuZi[2])
+				if !mj.IsValidHandCards(handCards2) {
+					continue
+				}
+
+				threePuZiChan := make(chan PuZi)
+				go genPuZi(threePuZiChan)
+				for three := range threePuZiChan {
+
+					var handCards3 = handCards2
+					handCards3 = append(handCards3, three.PuZi[0])
+					handCards3 = append(handCards3, three.PuZi[1])
+					handCards3 = append(handCards3, three.PuZi[2])
+					if !mj.IsValidHandCards(handCards3) {
+						continue
+					}
+
+					fourPuZiChan := make(chan PuZi)
+					go genPuZi(fourPuZiChan)
+					for four := range fourPuZiChan {
+
+						var handCards4 = handCards3
+						handCards4 = append(handCards4, four.PuZi[0])
+						handCards4 = append(handCards4, four.PuZi[1])
+						handCards4 = append(handCards4, four.PuZi[2])
+						if !mj.IsValidHandCards(handCards4) {
+							continue
+						}
+
+						count++
+
+						for i := 1; i <= mj.MAX_CARD; i++ {
+							laizi := []mj.Card{}
+							laizi = append(laizi, mj.Card(i))
+							if !mj.CanHuWithLaiZi(handCards4, laizi) {
+								mj.ShowHandCards(handCards4)
+								t.Error("CanHu failed.")
+							}
+						}
+
 					}
 
 				}
