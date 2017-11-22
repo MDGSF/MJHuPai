@@ -13,11 +13,6 @@ func init() {
 
 func CanHu(handCards []Card) bool {
 
-	cardsNum := len(handCards)
-	if cardsNum <= 0 || cardsNum%3 != 2 {
-		return false
-	}
-
 	if !IsValidHandCards(handCards) {
 		return false
 	}
@@ -101,6 +96,11 @@ func CanHu(handCards []Card) bool {
 }
 
 func IsValidHandCards(handCards []Card) bool {
+	cardsNum := len(handCards)
+	if cardsNum <= 0 || cardsNum%3 != 2 || cardsNum > MAX_HANDCARD_NUM {
+		return false
+	}
+
 	for _, c := range handCards {
 		if !IsValidCard(c) {
 			return false
