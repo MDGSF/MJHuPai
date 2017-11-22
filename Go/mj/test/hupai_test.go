@@ -24,7 +24,7 @@ func TestLaiZi(t *testing.T) {
 }
 
 func TestOneJiang(t *testing.T) {
-	for i := 1; i <= mj.MAX_CARD; i++ {
+	for i := 1; i <= mj.MaxCard; i++ {
 		if mj.IsValidCard(mj.Card(i)) {
 			handCards := []mj.Card{}
 			handCards = append(handCards, mj.Card(i))
@@ -38,7 +38,7 @@ func TestOneJiang(t *testing.T) {
 }
 
 func TestOneJiangWithOnePu(t *testing.T) {
-	for i := 1; i <= mj.MAX_CARD; i++ {
+	for i := 1; i <= mj.MaxCard; i++ {
 		if !mj.IsValidCard(mj.Card(i)) {
 			continue
 		}
@@ -47,7 +47,7 @@ func TestOneJiangWithOnePu(t *testing.T) {
 		handCards = append(handCards, mj.Card(i))
 		handCards = append(handCards, mj.Card(i))
 
-		for j := 1; j <= mj.MAX_CARD; j++ {
+		for j := 1; j <= mj.MaxCard; j++ {
 			if !mj.IsValidCard(mj.Card(j)) {
 				continue
 			}
@@ -67,8 +67,8 @@ func TestOneJiangWithOnePu(t *testing.T) {
 			}
 		}
 
-		for j := 1; j <= mj.MAX_CARD; j++ {
-			if !mj.IsXuShu(mj.Card(j)) || !mj.IsXuShu(mj.Card(j+1)) || !mj.IsXuShu(mj.Card(j+2)) {
+		for j := 1; j <= mj.MaxCard; j++ {
+			if !mj.IsRank(mj.Card(j)) || !mj.IsRank(mj.Card(j+1)) || !mj.IsRank(mj.Card(j+2)) {
 				continue
 			}
 
@@ -87,7 +87,7 @@ func TestOneJiangWithOnePu(t *testing.T) {
 }
 
 func TestOneJiangWithTwoPu(t *testing.T) {
-	for i := 1; i <= mj.MAX_CARD; i++ {
+	for i := 1; i <= mj.MaxCard; i++ {
 		if !mj.IsValidCard(mj.Card(i)) {
 			continue
 		}
@@ -96,7 +96,7 @@ func TestOneJiangWithTwoPu(t *testing.T) {
 		handCards = append(handCards, mj.Card(i))
 		handCards = append(handCards, mj.Card(i))
 
-		for j := 1; j <= mj.MAX_CARD; j++ {
+		for j := 1; j <= mj.MaxCard; j++ {
 			if !mj.IsValidCard(mj.Card(j)) {
 				continue
 			}
@@ -109,7 +109,7 @@ func TestOneJiangWithTwoPu(t *testing.T) {
 				continue
 			}
 
-			for k := 1; k <= mj.MAX_CARD; k++ {
+			for k := 1; k <= mj.MaxCard; k++ {
 				if !mj.IsValidCard(mj.Card(j)) {
 					continue
 				}
@@ -128,8 +128,8 @@ func TestOneJiangWithTwoPu(t *testing.T) {
 				}
 			}
 
-			for k := 1; k <= mj.MAX_CARD; k++ {
-				if !mj.IsXuShu(mj.Card(k)) || !mj.IsXuShu(mj.Card(k+1)) || !mj.IsXuShu(mj.Card(k+2)) {
+			for k := 1; k <= mj.MaxCard; k++ {
+				if !mj.IsRank(mj.Card(k)) || !mj.IsRank(mj.Card(k+1)) || !mj.IsRank(mj.Card(k+2)) {
 					continue
 				}
 
@@ -148,8 +148,8 @@ func TestOneJiangWithTwoPu(t *testing.T) {
 			}
 		}
 
-		for j := 1; j <= mj.MAX_CARD; j++ {
-			if !mj.IsXuShu(mj.Card(j)) || !mj.IsXuShu(mj.Card(j+1)) || !mj.IsXuShu(mj.Card(j+2)) {
+		for j := 1; j <= mj.MaxCard; j++ {
+			if !mj.IsRank(mj.Card(j)) || !mj.IsRank(mj.Card(j+1)) || !mj.IsRank(mj.Card(j+2)) {
 				continue
 			}
 
@@ -161,8 +161,8 @@ func TestOneJiangWithTwoPu(t *testing.T) {
 				continue
 			}
 
-			for k := 1; k <= mj.MAX_CARD; k++ {
-				if !mj.IsXuShu(mj.Card(k)) || !mj.IsXuShu(mj.Card(k+1)) || !mj.IsXuShu(mj.Card(k+2)) {
+			for k := 1; k <= mj.MaxCard; k++ {
+				if !mj.IsRank(mj.Card(k)) || !mj.IsRank(mj.Card(k+1)) || !mj.IsRank(mj.Card(k+2)) {
 					continue
 				}
 
@@ -390,7 +390,7 @@ func TestLaiZiOneJiangWithFourPu(t *testing.T) {
 
 						count++
 
-						for i := 1; i <= mj.MAX_CARD; i++ {
+						for i := 1; i <= mj.MaxCard; i++ {
 							laizi := []mj.Card{}
 							laizi = append(laizi, mj.Card(i))
 							if !mj.CanHuWithLaiZi(handCards4, laizi) {
@@ -412,7 +412,7 @@ func TestLaiZiOneJiangWithFourPu(t *testing.T) {
 }
 
 func genJiang(jiangChan chan mj.Card) {
-	for i := 1; i <= mj.MAX_CARD; i++ {
+	for i := 1; i <= mj.MaxCard; i++ {
 		if !mj.IsValidCard(mj.Card(i)) {
 			continue
 		}
@@ -427,7 +427,7 @@ type PuZi struct {
 }
 
 func genPuZi(puziChan chan PuZi) {
-	for i := 1; i <= mj.MAX_CARD; i++ {
+	for i := 1; i <= mj.MaxCard; i++ {
 		if !mj.IsValidCard(mj.Card(i)) {
 			continue
 		}
@@ -439,8 +439,8 @@ func genPuZi(puziChan chan PuZi) {
 		puziChan <- pu
 	}
 
-	for i := 1; i <= mj.MAX_CARD; i++ {
-		if !mj.IsXuShu(mj.Card(i)) || !mj.IsXuShu(mj.Card(i+1)) || !mj.IsXuShu(mj.Card(i+2)) {
+	for i := 1; i <= mj.MaxCard; i++ {
+		if !mj.IsRank(mj.Card(i)) || !mj.IsRank(mj.Card(i+1)) || !mj.IsRank(mj.Card(i+2)) {
 			continue
 		}
 

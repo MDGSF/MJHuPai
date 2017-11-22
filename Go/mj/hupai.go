@@ -24,7 +24,7 @@ func CanHuWithLaiZi(handCards []Card, laizi []Card) bool {
 	}
 
 	laiziNum := 0
-	var slots [MAX_CARD_ARRAY_SIZE]Card
+	var slots [MaxCardArraySize]Card
 	for _, c := range handCards {
 		if isLaizi(c, laizi) {
 			laiziNum++
@@ -236,7 +236,7 @@ return: true手牌合法，false手牌非法。
 */
 func IsValidHandCards(handCards []Card) bool {
 	cardsNum := len(handCards)
-	if cardsNum <= 0 || cardsNum%3 != 2 || cardsNum > MAX_HANDCARD_NUM {
+	if cardsNum <= 0 || cardsNum%3 != 2 || cardsNum > MaxHandCardNum {
 		return false
 	}
 
@@ -260,7 +260,7 @@ func IsValidHandCards(handCards []Card) bool {
 GenSlots 将手牌转换为对应的表示每张牌数量的数组。
 例子：
 handCards []Card = {0x01, 0x01, 0x11, 0x12, 0x13, 0x33, 0x43, 0x43}
-[MAX_CARD_ARRAY_SIZE]Card = {
+[MaxCardArraySize]Card = {
 	2, 0, 0, 0, 0, 0, 0, 0, 0, //万
 	1, 1, 1, 0, 0, 0, 0, 0, 0, //条
 	0, 0, 0, 0, 0, 0, 0, 0, 0, //筒
@@ -268,8 +268,8 @@ handCards []Card = {0x01, 0x01, 0x11, 0x12, 0x13, 0x33, 0x43, 0x43}
 	0, 0, 2, //箭
 }
 */
-func GenSlots(handCards []Card) [MAX_CARD_ARRAY_SIZE]Card {
-	var slots [MAX_CARD_ARRAY_SIZE]Card
+func GenSlots(handCards []Card) [MaxCardArraySize]Card {
+	var slots [MaxCardArraySize]Card
 
 	for _, c := range handCards {
 		slots[c]++
@@ -278,27 +278,27 @@ func GenSlots(handCards []Card) [MAX_CARD_ARRAY_SIZE]Card {
 	return slots
 }
 
-func getWan(slots [MAX_CARD_ARRAY_SIZE]Card) int {
-	return getNum(slots, CardYiWan, CardJiuWan)
+func getWan(slots [MaxCardArraySize]Card) int {
+	return getNum(slots, CharacterOne, CharacterNine)
 }
 
-func getTiao(slots [MAX_CARD_ARRAY_SIZE]Card) int {
-	return getNum(slots, CardYaoJi, CardJiuTiao)
+func getTiao(slots [MaxCardArraySize]Card) int {
+	return getNum(slots, BambooOne, BambooNine)
 }
 
-func getTong(slots [MAX_CARD_ARRAY_SIZE]Card) int {
-	return getNum(slots, CardYiTong, CardJiuTong)
+func getTong(slots [MaxCardArraySize]Card) int {
+	return getNum(slots, DotOne, DotNine)
 }
 
-func getFeng(slots [MAX_CARD_ARRAY_SIZE]Card) int {
-	return getNum(slots, CardDONG, CardBEI)
+func getFeng(slots [MaxCardArraySize]Card) int {
+	return getNum(slots, EastWind, NorthWind)
 }
 
-func getJian(slots [MAX_CARD_ARRAY_SIZE]Card) int {
-	return getNum(slots, CardZHONG, CardBAI)
+func getJian(slots [MaxCardArraySize]Card) int {
+	return getNum(slots, RedDragon, WhiteDragon)
 }
 
-func getNum(slots [MAX_CARD_ARRAY_SIZE]Card, iStart int, iEnd int) int {
+func getNum(slots [MaxCardArraySize]Card, iStart int, iEnd int) int {
 	num := 0
 	for i := iStart; i <= iEnd; i++ {
 		num = num*10 + int(slots[i])
