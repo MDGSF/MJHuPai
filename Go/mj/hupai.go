@@ -11,6 +11,12 @@ func init() {
 	tableMgr.Load("../genTable/")
 }
 
+/*
+CanHuWithLaiZi 赖子胡牌
+handCards: 手牌数组，最多14张。
+laizi: 赖子数组，保存可能的赖子。
+return: true可以胡牌，false不可以胡牌。
+*/
 func CanHuWithLaiZi(handCards []Card, laizi []Card) bool {
 
 	if !IsValidHandCards(handCards) {
@@ -134,6 +140,11 @@ func isLaizi(c Card, LaiZiArr []Card) bool {
 	return false
 }
 
+/*
+CanHu 胡牌
+handCards: 手牌数组，最多14张。
+return: true可以胡牌，false不可以胡牌。
+*/
 func CanHu(handCards []Card) bool {
 
 	if !IsValidHandCards(handCards) {
@@ -218,6 +229,11 @@ func CanHu(handCards []Card) bool {
 	return false
 }
 
+/*
+IsValidHandCards 判断手牌是否合法
+handCards: 手牌数组，最多14张。
+return: true手牌合法，false手牌非法。
+*/
 func IsValidHandCards(handCards []Card) bool {
 	cardsNum := len(handCards)
 	if cardsNum <= 0 || cardsNum%3 != 2 || cardsNum > MAX_HANDCARD_NUM {
@@ -240,6 +256,18 @@ func IsValidHandCards(handCards []Card) bool {
 	return true
 }
 
+/*
+GenSlots 将手牌转换为对应的表示每张牌数量的数组。
+例子：
+handCards []Card = {0x01, 0x01, 0x11, 0x12, 0x13, 0x33, 0x43, 0x43}
+[MAX_CARD_ARRAY_SIZE]Card = {
+	2, 0, 0, 0, 0, 0, 0, 0, 0, //万
+	1, 1, 1, 0, 0, 0, 0, 0, 0, //条
+	0, 0, 0, 0, 0, 0, 0, 0, 0, //筒
+	0, 0, 1, 0, //风
+	0, 0, 2, //箭
+}
+*/
 func GenSlots(handCards []Card) [MAX_CARD_ARRAY_SIZE]Card {
 	var slots [MAX_CARD_ARRAY_SIZE]Card
 
@@ -278,6 +306,9 @@ func getNum(slots [MAX_CARD_ARRAY_SIZE]Card, iStart int, iEnd int) int {
 	return num
 }
 
+/*
+ShowHandCards 打印手牌
+*/
 func ShowHandCards(handCards []Card) {
 	for _, c := range handCards {
 		fmt.Printf("0x%02X, ", c)

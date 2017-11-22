@@ -1,8 +1,9 @@
 package main
 
 import (
-	"jian/mj"
 	"testing"
+
+	"github.com/MDGSF/MJHuPai/Go/mj"
 )
 
 func Test1(t *testing.T) {
