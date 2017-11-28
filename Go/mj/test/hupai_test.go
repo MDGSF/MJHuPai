@@ -453,7 +453,3 @@ func genPuZi(puziChan chan PuZi) {
 
 	close(puziChan)
 }
-
-func main() {
-
-}

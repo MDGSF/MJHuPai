@@ -8,7 +8,8 @@ var tableMgr *TableMgr
 
 func init() {
 	tableMgr = NewTableMgr()
-	tableMgr.Load("../genTable/")
+	tableMgr.Load("E:\\Go\\GOPATH\\src\\github.com\\MDGSF\\MJHuPai\\Go\\mj\\genTable\\")
+	initM1()
 }
 
 /*
@@ -372,3 +373,74 @@ func ShowHandCards(handCards []Card) {
 
 表生成耗时：2-3S
 */
+
+var M1 map[int]Card
+
+func initM1() {
+
+	M1 = make(map[int]Card)
+
+	M1[0] = Card(0x01)
+	M1[1] = Card(0x02)
+	M1[2] = Card(0x03)
+	M1[3] = Card(0x04)
+	M1[4] = Card(0x05)
+	M1[5] = Card(0x06)
+	M1[6] = Card(0x07)
+	M1[7] = Card(0x08)
+	M1[8] = Card(0x09)
+
+	M1[9] = Card(0x11)
+	M1[10] = Card(0x12)
+	M1[11] = Card(0x13)
+	M1[12] = Card(0x14)
+	M1[13] = Card(0x15)
+	M1[14] = Card(0x16)
+	M1[15] = Card(0x17)
+	M1[16] = Card(0x18)
+	M1[17] = Card(0x19)
+
+	M1[18] = Card(0x21)
+	M1[19] = Card(0x22)
+	M1[20] = Card(0x23)
+	M1[21] = Card(0x24)
+	M1[22] = Card(0x25)
+	M1[23] = Card(0x26)
+	M1[24] = Card(0x27)
+	M1[25] = Card(0x28)
+	M1[26] = Card(0x29)
+
+	M1[27] = Card(0x31)
+	M1[28] = Card(0x32)
+	M1[29] = Card(0x33)
+	M1[30] = Card(0x34)
+
+	M1[31] = Card(0x41)
+	M1[32] = Card(0x42)
+	M1[33] = Card(0x43)
+
+	M1[34] = Card(0x51)
+	M1[35] = Card(0x52)
+	M1[36] = Card(0x53)
+	M1[37] = Card(0x54)
+	M1[38] = Card(0x55)
+	M1[39] = Card(0x56)
+	M1[40] = Card(0x57)
+	M1[41] = Card(0x58)
+}
+
+//IsWinableTest test
+func IsWinableTest(hai []int) bool {
+
+	if len(hai) > 14 {
+		return false
+	}
+
+	handCards := make([]Card, 0)
+
+	for _, v := range hai {
+		handCards = append(handCards, M1[v])
+	}
+
+	return CanHu(handCards)
+}
