@@ -160,23 +160,29 @@ func CanHu(handCards []Card) bool {
 	// fmt.Println("getFeng = ", getFeng(slots))
 	// fmt.Println("getJian = ", getJian(slots))
 
+	wan := getWan(slots)
+	tiao := getTiao(slots)
+	tong := getTong(slots)
+	feng := getFeng(slots)
+	jian := getJian(slots)
+
 	var XuShu []int
-	if getWan(slots) > 0 {
-		XuShu = append(XuShu, getWan(slots))
+	if wan > 0 {
+		XuShu = append(XuShu, wan)
 	}
-	if getTiao(slots) > 0 {
-		XuShu = append(XuShu, getTiao(slots))
+	if tiao > 0 {
+		XuShu = append(XuShu, tiao)
 	}
-	if getTong(slots) > 0 {
-		XuShu = append(XuShu, getTong(slots))
+	if tong > 0 {
+		XuShu = append(XuShu, tong)
 	}
 
 	var Zi []int
-	if getFeng(slots) > 0 {
-		Zi = append(Zi, getFeng(slots))
+	if feng > 0 {
+		Zi = append(Zi, feng)
 	}
-	if getJian(slots) > 0 {
-		Zi = append(Zi, getJian(slots))
+	if jian > 0 {
+		Zi = append(Zi, jian)
 	}
 
 	for i, iNum := range XuShu {
