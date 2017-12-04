@@ -140,14 +140,14 @@ func checkAndAdd(cards []int, iLaiZiNum int) bool {
 	HandCardsMapTemp := curTableTemp[iLaiZiNum]
 	_, exists := (*HandCardsMapTemp)[key]
 	if exists {
-		return false
+		return false //这里说明这个情况处理过了，去重。
 	}
 
 	(*HandCardsMapTemp)[key] = true
 
 	for i := 0; i < curCardsTypeNum; i++ {
 		if cards[i] > 4 {
-			return true
+			return true //这里用true是说这种情况不行，但是如果有赖子的话，还是可能可以的。
 		}
 	}
 
