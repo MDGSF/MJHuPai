@@ -12,13 +12,21 @@
 
 取自：https://github.com/yuanfengyun/qipai.git
 
-## C++/public 
+## C++/public
 
 麻将子通用定义
 
 ## Go
 
 麻将通用胡牌算法实现。(https://github.com/yuanfengyun/qipai.git)
+
+## Java
+
+http://hp.vector.co.jp/authors/VA046927/mjscore/mjalgorism.html
+
+http://hp.vector.co.jp/authors/VA046927/mjscore/AgariIndex.java
+
+http://hp.vector.co.jp/authors/VA046927/mjscore/AgariBacktrack.java
 
 
 # 麻将基础
@@ -43,3 +51,9 @@
 #### 二. 花牌 合计8张
 
 1. 春、夏、秋、冬、梅、兰、竹、菊
+
+
+https://www.zhihu.com/question/47908832
+
+https://www.zhihu.com/question/47124225
+
