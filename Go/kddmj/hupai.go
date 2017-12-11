@@ -24,14 +24,22 @@ func CanHuWithLaiZi(handCards []int, laizi []int) (bool, int) {
 		return false, 0
 	}
 
+	var bHasCommonCard = false
+
 	laiziNum := 0
 	var slots [TILEMAX]int
 	for _, c := range handCards {
 		if isLaizi(c, laizi) {
 			laiziNum++
 		} else {
+			bHasCommonCard = true
 			slots[c]++
 		}
+	}
+
+	if !bHasCommonCard && laiziNum > 0 {
+		//手牌全部都是赖子。
+		return true, 10
 	}
 
 	var XuShu []int
@@ -57,12 +65,14 @@ func CanHuWithLaiZi(handCards []int, laizi []int) (bool, int) {
 	for i, iNum := range XuShu {
 		success := true
 		hasLaiZiNum := laiziNum
-		dianShu, needLaiZiNum, ok := tableMgr.TableXuShuWithEye.IsInTable(iNum)
-		if !ok || needLaiZiNum > hasLaiZiNum {
+
+		//这里会把8个赖子全部遍历，但是没有必要，因为也许我一共也只有3个赖子。
+		dianShu, jiangNeedLaiZiNum, ok := tableMgr.TableXuShuWithEye.IsInTable(iNum)
+		if !ok || jiangNeedLaiZiNum > hasLaiZiNum {
 			continue
 		}
-		hasLaiZiNum -= needLaiZiNum
-		if needLaiZiNum > 0 {
+		hasLaiZiNum -= jiangNeedLaiZiNum
+		if jiangNeedLaiZiNum > 0 {
 			maxDianShu = dianShu
 		}
 
@@ -99,21 +109,39 @@ func CanHuWithLaiZi(handCards []int, laizi []int) (bool, int) {
 			continue
 		}
 
-		if hasLaiZiNum >= 3 {
-			maxDianShu = 10
+		if hasLaiZiNum >= 3 || maxDianShu == 10 {
+			return true, 10
 		}
+
+		if jiangNeedLaiZiNum == 2 {
+			_, ok := tableMgr.TableXuShu.IsInTableMap(iNum, 0)
+			if ok {
+				return true, 10
+			}
+		} else if jiangNeedLaiZiNum == 3 {
+			_, ok := tableMgr.TableXuShu.IsInTableMap(iNum, 1)
+			if ok {
+				return true, 10
+			}
+		} else if jiangNeedLaiZiNum == 4 {
+			_, ok := tableMgr.TableXuShu.IsInTableMap(iNum, 2)
+			if ok {
+				return true, 10
+			}
+		}
+
 		return true, maxDianShu
 	}
 
 	for i, iNum := range Zi {
 		success := true
 		hasLaiZiNum := laiziNum
-		dianShu, needLaiZiNum, ok := tableMgr.TableZiWithEye.IsInTable(iNum)
-		if !ok || needLaiZiNum > hasLaiZiNum {
+		dianShu, jiangNeedLaiZiNum, ok := tableMgr.TableZiWithEye.IsInTable(iNum)
+		if !ok || jiangNeedLaiZiNum > hasLaiZiNum {
 			continue
 		}
-		hasLaiZiNum -= needLaiZiNum
-		if needLaiZiNum > 0 {
+		hasLaiZiNum -= jiangNeedLaiZiNum
+		if jiangNeedLaiZiNum > 0 {
 			maxDianShu = dianShu
 		}
 
@@ -150,9 +178,27 @@ func CanHuWithLaiZi(handCards []int, laizi []int) (bool, int) {
 			continue
 		}
 
-		if hasLaiZiNum >= 3 {
-			maxDianShu = 10
+		if hasLaiZiNum >= 3 || maxDianShu == 10 {
+			return true, 10
 		}
+
+		if jiangNeedLaiZiNum == 2 {
+			_, ok := tableMgr.TableZi.IsInTableMap(iNum, 0)
+			if ok {
+				return true, 10
+			}
+		} else if jiangNeedLaiZiNum == 3 {
+			_, ok := tableMgr.TableZi.IsInTableMap(iNum, 1)
+			if ok {
+				return true, 10
+			}
+		} else if jiangNeedLaiZiNum == 4 {
+			_, ok := tableMgr.TableZi.IsInTableMap(iNum, 2)
+			if ok {
+				return true, 10
+			}
+		}
+
 		return true, maxDianShu
 	}
 

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/MDGSF/MJHuPai/Go/kddmj"
@@ -18,12 +17,11 @@ func Test1(t *testing.T) {
 func TestLaiZi(t *testing.T) {
 	handCards := []int{0, 0, 1, 2, 3}
 	laizi := []int{9}
-	ok, dianshu := kddmj.CanHuWithLaiZi(handCards, laizi)
+	ok, _ := kddmj.CanHuWithLaiZi(handCards, laizi)
 	if !ok {
 		kddmj.ShowHandCards(handCards)
 		t.Error("CanHu failed.")
 	}
-	fmt.Println("dianshu = ", dianshu)
 }
 
 func TestOneJiang(t *testing.T) {
@@ -338,7 +336,139 @@ func TestOneJiangWithFourPu(t *testing.T) {
 	t.Log("count = ", count)
 }
 
+func TestLaiZiOneJiang1(t *testing.T) {
+	for i := kddmj.MAN; i <= kddmj.CHU; i++ {
+		if kddmj.IsValidCard(int(i)) {
+			handCards := []int{}
+			handCards = append(handCards, int(i))
+			handCards = append(handCards, int(i))
+			laizi := []int{}
+			ok, dianshu := kddmj.CanHuWithLaiZi(handCards, laizi)
+			if !ok || dianshu != 0 {
+				kddmj.ShowHandCards(handCards)
+				t.Error("CanHu failed.")
+			}
+		}
+	}
+}
+
+func TestLaiZiOneJiang2(t *testing.T) {
+	for i := kddmj.MAN; i <= kddmj.CHU; i++ {
+		if kddmj.IsValidCard(int(i)) {
+			handCards := []int{}
+			handCards = append(handCards, int(i))
+			handCards = append(handCards, int(i))
+			laizi := []int{}
+			laizi = append(laizi, int(i))
+			ok, dianshu := kddmj.CanHuWithLaiZi(handCards, laizi)
+			if !ok || dianshu != 10 {
+				kddmj.ShowHandCards(handCards)
+				t.Error("CanHu failed.")
+			}
+		}
+	}
+}
+
+func TestLaiZiOneJiangWithOnePu1(t *testing.T) {
+	jiangChan := make(chan int)
+	go genJiang(jiangChan)
+	for jiang := range jiangChan {
+
+		handCards := []int{}
+		handCards = append(handCards, jiang)
+		handCards = append(handCards, jiang)
+
+		onePuZiChan := make(chan PuZi)
+		go genPuZi(onePuZiChan)
+		for one := range onePuZiChan {
+
+			var handCards1 = handCards
+			handCards1 = append(handCards1, one.PuZi[0])
+			handCards1 = append(handCards1, one.PuZi[1])
+			handCards1 = append(handCards1, one.PuZi[2])
+			if !kddmj.IsValidHandCards(handCards1) {
+				continue
+			}
+
+			laizi := []int{}
+			laizi = append(laizi, jiang)
+			ok, dianshu := kddmj.CanHuWithLaiZi(handCards1, laizi)
+			if !ok || dianshu != 10 {
+				kddmj.ShowHandCards(handCards1)
+				t.Error("CanHu failed.")
+			}
+		}
+	}
+}
+
+func TestLaiZiOneJiangWithTwoPu(t *testing.T) {
+	jiangChan := make(chan int)
+	go genJiang(jiangChan)
+	for jiang := range jiangChan {
+
+		handCards := []int{}
+		handCards = append(handCards, jiang)
+		handCards = append(handCards, jiang)
+
+		AddPuZiToHandCards(t, handCards, jiang, 2)
+	}
+}
+
+func TestLaiZiOneJiangWithThreePu(t *testing.T) {
+	jiangChan := make(chan int)
+	go genJiang(jiangChan)
+	for jiang := range jiangChan {
+
+		handCards := []int{}
+		handCards = append(handCards, jiang)
+		handCards = append(handCards, jiang)
+
+		AddPuZiToHandCards(t, handCards, jiang, 3)
+	}
+}
+
 func TestLaiZiOneJiangWithFourPu(t *testing.T) {
+	jiangChan := make(chan int)
+	go genJiang(jiangChan)
+	for jiang := range jiangChan {
+
+		handCards := []int{}
+		handCards = append(handCards, jiang)
+		handCards = append(handCards, jiang)
+
+		AddPuZiToHandCards(t, handCards, jiang, 4)
+	}
+}
+
+func AddPuZiToHandCards(t *testing.T, handCards []int, jiang int, level int) {
+	if level <= 0 {
+		laizi := []int{}
+		laizi = append(laizi, jiang)
+		ok, dianshu := kddmj.CanHuWithLaiZi(handCards, laizi)
+		if !ok || dianshu != 10 {
+			kddmj.ShowHandCards(handCards)
+			t.Error("CanHu failed.")
+		}
+		return
+	}
+
+	onePuZiChan := make(chan PuZi)
+	go genPuZi(onePuZiChan)
+	for one := range onePuZiChan {
+
+		var handCards1 = handCards
+		handCards1 = append(handCards1, one.PuZi[0])
+		handCards1 = append(handCards1, one.PuZi[1])
+		handCards1 = append(handCards1, one.PuZi[2])
+		if !kddmj.IsValidHandCards(handCards1) {
+			continue
+		}
+
+		AddPuZiToHandCards(t, handCards1, jiang, level-1)
+	}
+}
+
+func TestLaiZiOneJiangWithFourPu2(t *testing.T) {
 
 	count := 0
 	t.Log("count = ", count)
