@@ -17,7 +17,7 @@ func Test1(t *testing.T) {
 
 func TestLaiZi(t *testing.T) {
 	handCards := []int{0, 0, 1, 2, 3}
-	laizi := []int{1}
+	laizi := []int{9}
 	ok, dianshu := kddmj.CanHuWithLaiZi(handCards, laizi)
 	if !ok {
 		kddmj.ShowHandCards(handCards)

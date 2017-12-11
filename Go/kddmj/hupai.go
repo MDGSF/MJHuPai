@@ -99,6 +99,9 @@ func CanHuWithLaiZi(handCards []int, laizi []int) (bool, int) {
 			continue
 		}
 
+		if hasLaiZiNum >= 3 {
+			maxDianShu = 10
+		}
 		return true, maxDianShu
 	}
 
@@ -147,6 +150,9 @@ func CanHuWithLaiZi(handCards []int, laizi []int) (bool, int) {
 			continue
 		}
 
+		if hasLaiZiNum >= 3 {
+			maxDianShu = 10
+		}
 		return true, maxDianShu
 	}
 
