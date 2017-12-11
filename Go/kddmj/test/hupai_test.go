@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/MDGSF/MJHuPai/Go/kddmj"
@@ -16,11 +17,13 @@ func Test1(t *testing.T) {
 
 func TestLaiZi(t *testing.T) {
 	handCards := []int{0, 0, 1, 2, 3}
-	laizi := []int{0x11}
-	if !kddmj.CanHuWithLaiZi(handCards, laizi) {
+	laizi := []int{1}
+	ok, dianshu := kddmj.CanHuWithLaiZi(handCards, laizi)
+	if !ok {
 		kddmj.ShowHandCards(handCards)
 		t.Error("CanHu failed.")
 	}
+	fmt.Println("dianshu = ", dianshu)
 }
 
 func TestOneJiang(t *testing.T) {
@@ -401,7 +404,8 @@ func TestLaiZiOneJiangWithFourPu(t *testing.T) {
 						//for i := 1; i <= kddmj.MaxCard; i++ {
 						laizi := []int{0x01}
 						//laizi = append(laizi, int(i))
-						if !kddmj.CanHuWithLaiZi(handCards4, laizi) {
+						ok, _ := kddmj.CanHuWithLaiZi(handCards4, laizi)
+						if !ok {
 							kddmj.ShowHandCards(handCards4)
 							t.Error("CanHu failed.")
 						}

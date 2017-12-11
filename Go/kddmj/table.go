@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 )
 
 //LaiZiNum 赖子的数量
@@ -21,32 +22,33 @@ map[1]中保存着当赖子的数量为1的时候，可以胡牌的所有可能�
 ...
 */
 type Table struct {
-	Map [LaiZiNum]*map[int]bool
+	Map [LaiZiNum]*map[int]int
 }
 
 //NewTable 新建一张表
 func NewTable() *Table {
 	table := &Table{}
 	for i := 0; i < LaiZiNum; i++ {
-		table.Map[i] = &map[int]bool{}
+		table.Map[i] = &map[int]int{}
 	}
 	return table
 }
 
 //IsInTable 判断num是否在这个表中
-func (table *Table) IsInTable(num int) (int, bool) {
+func (table *Table) IsInTable(num int) (int, int, bool) {
 	for i := 0; i < LaiZiNum; i++ {
-		if table.IsInTableMap(num, i) {
-			return i, true
+		value, ok := table.IsInTableMap(num, i)
+		if ok {
+			return value, i, true
 		}
 	}
-	return 0, false
+	return 0, 0, false
 }
 
 //IsInTableMap 判断num是不是在有iLaiZiNum个赖子的那个map中
-func (table *Table) IsInTableMap(num int, iLaiZiNum int) bool {
-	_, ok := (*table.Map[iLaiZiNum])[num]
-	return ok
+func (table *Table) IsInTableMap(num int, iLaiZiNum int) (int, bool) {
+	value, ok := (*table.Map[iLaiZiNum])[num]
+	return value, ok
 }
 
 //Load 加载表到内存中
@@ -65,7 +67,7 @@ func (table *Table) Dump(prefix string) {
 	}
 }
 
-func loadFromFile(name string, table *map[int]bool) {
+func loadFromFile(name string, table *map[int]int) {
 	file, _ := os.Open(name)
 	defer file.Close()
 
@@ -76,17 +78,19 @@ func loadFromFile(name string, table *map[int]bool) {
 			break
 		}
 		str := string(buf)
-		key, _ := strconv.Atoi(str)
-		(*table)[key] = true
+		result := strings.Split(str, "=")
+		key, _ := strconv.Atoi(result[0])
+		value, _ := strconv.Atoi(result[1])
+		(*table)[key] = value
 	}
 }
 
-func dumpToFile(name string, table *map[int]bool) {
+func dumpToFile(name string, table *map[int]int) {
 	file, _ := os.OpenFile(name, os.O_WRONLY|os.O_CREATE, 0666)
 	defer file.Close()
 	buf := bufio.NewWriter(file)
-	for key := range *table {
-		fmt.Fprintf(buf, "%d\n", key)
+	for key, value := range *table {
+		fmt.Fprintf(buf, "%d=%d\n", key, value)
 	}
 	buf.Flush()
 }

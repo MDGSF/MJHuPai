@@ -8,7 +8,7 @@ var tableMgr *TableMgr
 
 func init() {
 	tableMgr = NewTableMgr()
-	tableMgr.Load("E:\\Go\\GOPATH\\src\\github.com\\MDGSF\\MJHuPai\\Go\\mj\\genTable\\")
+	tableMgr.Load("E:\\Go\\GOPATH\\src\\github.com\\MDGSF\\MJHuPai\\Go\\kddmj\\genTable\\")
 }
 
 /*
@@ -16,11 +16,12 @@ CanHuWithLaiZi 赖子胡牌
 handCards: 手牌数组，最多14张。
 laizi: 赖子数组，保存可能的赖子。
 return: true可以胡牌，false不可以胡牌。
+return int: 点数。
 */
-func CanHuWithLaiZi(handCards []int, laizi []int) bool {
+func CanHuWithLaiZi(handCards []int, laizi []int) (bool, int) {
 
 	if !IsValidHandCards(handCards) {
-		return false
+		return false, 0
 	}
 
 	laiziNum := 0
@@ -52,83 +53,104 @@ func CanHuWithLaiZi(handCards []int, laizi []int) bool {
 		Zi = append(Zi, getJian(slots))
 	}
 
+	var maxDianShu = 0
 	for i, iNum := range XuShu {
 		success := true
 		hasLaiZiNum := laiziNum
-		needLaiZiNum, ok := tableMgr.TableXuShuWithEye.IsInTable(iNum)
+		dianShu, needLaiZiNum, ok := tableMgr.TableXuShuWithEye.IsInTable(iNum)
 		if !ok || needLaiZiNum > hasLaiZiNum {
 			continue
 		}
 		hasLaiZiNum -= needLaiZiNum
+		if needLaiZiNum > 0 {
+			maxDianShu = dianShu
+		}
 
 		for j, jNum := range XuShu {
 			if i == j {
 				continue
 			}
-			needLaiZiNum, ok := tableMgr.TableXuShu.IsInTable(jNum)
+			dianShu, needLaiZiNum, ok := tableMgr.TableXuShu.IsInTable(jNum)
 			if !ok || needLaiZiNum > hasLaiZiNum {
 				success = false
 				break
 			}
 			hasLaiZiNum -= needLaiZiNum
+			if needLaiZiNum > 0 && dianShu > maxDianShu {
+				maxDianShu = dianShu
+			}
 		}
 		if !success {
 			continue
 		}
 
 		for _, num := range Zi {
-			needLaiZiNum, ok := tableMgr.TableZi.IsInTable(num)
+			dianShu, needLaiZiNum, ok := tableMgr.TableZi.IsInTable(num)
 			if !ok || needLaiZiNum > hasLaiZiNum {
 				success = false
 				break
+			}
+			hasLaiZiNum -= needLaiZiNum
+			if needLaiZiNum > 0 && dianShu > maxDianShu {
+				maxDianShu = dianShu
 			}
 		}
 		if !success {
 			continue
 		}
 
-		return true
+		return true, maxDianShu
 	}
 
 	for i, iNum := range Zi {
 		success := true
 		hasLaiZiNum := laiziNum
-		needLaiZiNum, ok := tableMgr.TableZiWithEye.IsInTable(iNum)
+		dianShu, needLaiZiNum, ok := tableMgr.TableZiWithEye.IsInTable(iNum)
 		if !ok || needLaiZiNum > hasLaiZiNum {
 			continue
 		}
 		hasLaiZiNum -= needLaiZiNum
+		if needLaiZiNum > 0 {
+			maxDianShu = dianShu
+		}
 
 		for j, jNum := range Zi {
 			if i == j {
 				continue
 			}
-			needLaiZiNum, ok := tableMgr.TableZi.IsInTable(jNum)
+			dianShu, needLaiZiNum, ok := tableMgr.TableZi.IsInTable(jNum)
 			if !ok || needLaiZiNum > hasLaiZiNum {
 				success = false
 				break
 			}
 			hasLaiZiNum -= needLaiZiNum
+			if needLaiZiNum > 0 && dianShu > maxDianShu {
+				maxDianShu = dianShu
+			}
 		}
 		if !success {
 			continue
 		}
 
 		for _, num := range XuShu {
-			needLaiZiNum, ok := tableMgr.TableXuShu.IsInTable(num)
+			dianShu, needLaiZiNum, ok := tableMgr.TableXuShu.IsInTable(num)
 			if !ok || needLaiZiNum > hasLaiZiNum {
 				success = false
 				break
+			}
+			hasLaiZiNum -= needLaiZiNum
+			if needLaiZiNum > 0 && dianShu > maxDianShu {
+				maxDianShu = dianShu
 			}
 		}
 		if !success {
 			continue
 		}
 
-		return true
+		return true, maxDianShu
 	}
 
-	return false
+	return false, 0
 }
 
 func isLaizi(c int, LaiZiArr []int) bool {
@@ -185,7 +207,8 @@ func CanHu(handCards []int) bool {
 	}
 
 	for i, iNum := range XuShu {
-		if !tableMgr.TableXuShuWithEye.IsInTableMap(iNum, 0) {
+		_, ok := tableMgr.TableXuShuWithEye.IsInTableMap(iNum, 0)
+		if !ok {
 			continue
 		}
 
@@ -194,13 +217,15 @@ func CanHu(handCards []int) bool {
 				continue
 			}
 
-			if !tableMgr.TableXuShu.IsInTableMap(jNum, 0) {
+			_, ok := tableMgr.TableXuShu.IsInTableMap(jNum, 0)
+			if !ok {
 				return false
 			}
 		}
 
 		for _, num := range Zi {
-			if !tableMgr.TableZi.IsInTableMap(num, 0) {
+			_, ok := tableMgr.TableZi.IsInTableMap(num, 0)
+			if !ok {
 				return false
 			}
 		}
@@ -209,7 +234,8 @@ func CanHu(handCards []int) bool {
 	}
 
 	for i, iNum := range Zi {
-		if !tableMgr.TableZiWithEye.IsInTableMap(iNum, 0) {
+		_, ok := tableMgr.TableZiWithEye.IsInTableMap(iNum, 0)
+		if !ok {
 			continue
 		}
 
@@ -218,13 +244,15 @@ func CanHu(handCards []int) bool {
 				continue
 			}
 
-			if !tableMgr.TableZi.IsInTableMap(jNum, 0) {
+			_, ok := tableMgr.TableZi.IsInTableMap(jNum, 0)
+			if !ok {
 				return false
 			}
 		}
 
 		for _, num := range XuShu {
-			if !tableMgr.TableXuShu.IsInTableMap(num, 0) {
+			_, ok := tableMgr.TableXuShu.IsInTableMap(num, 0)
+			if !ok {
 				return false
 			}
 		}
