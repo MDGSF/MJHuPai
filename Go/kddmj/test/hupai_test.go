@@ -1,7 +1,12 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
+	"os"
+	"sort"
 	"testing"
+	"time"
 
 	"github.com/MDGSF/MJHuPai/Go/kddmj"
 )
@@ -415,6 +420,10 @@ func TestLaiZiOneJiangWithTwoPu(t *testing.T) {
 }
 
 func TestLaiZiOneJiangWithThreePu(t *testing.T) {
+
+	count = 0
+	start := time.Now()
+
 	jiangChan := make(chan int)
 	go genJiang(jiangChan)
 	for jiang := range jiangChan {
@@ -425,6 +434,10 @@ func TestLaiZiOneJiangWithThreePu(t *testing.T) {
 
 		AddPuZiToHandCards(t, handCards, jiang, 3)
 	}
+
+	elapsed := time.Since(start)
+
+	fmt.Println("count = ", count, ", elapsed=", elapsed)
 }
 
 func TestLaiZiOneJiangWithFourPu(t *testing.T) {
@@ -442,6 +455,7 @@ func TestLaiZiOneJiangWithFourPu(t *testing.T) {
 
 func AddPuZiToHandCards(t *testing.T, handCards []int, jiang int, level int) {
 	if level <= 0 {
+		count++
 		laizi := []int{}
 		laizi = append(laizi, jiang)
 		ok, dianshu := kddmj.CanHuWithLaiZi(handCards, laizi)
@@ -596,6 +610,107 @@ func genPuZi(puziChan chan PuZi) {
 	}
 
 	close(puziChan)
+}
+
+type HuRet struct {
+	handCards []int
+	hu        bool
+	dianshu   int
+	laizi     int
+}
+
+type HuArray struct {
+	arr []*HuRet
+}
+
+var count int
+
+func TestGenAllPossible(t *testing.T) {
+	count = 0
+	var m1 map[int]*HuArray
+	m1 = make(map[int]*HuArray)
+
+	handCards := []int{}
+	handCards = append(handCards, 0)
+	handCards = append(handCards, 0)
+	GenAllPossibleAddPuZiToHandCards(t, m1, handCards, 0, 4)
+
+	file, _ := os.OpenFile("allPossible.log", os.O_WRONLY|os.O_CREATE, 0666)
+	defer file.Close()
+	buf := bufio.NewWriter(file)
+	fmt.Fprintf(buf, "count = %d\n", count)
+	for k, v := range m1 {
+		for _, vj := range v.arr {
+			fmt.Fprintf(buf, "%d=%v, %v, dianshu=%d, laizi=%d\n", k, vj.handCards, vj.hu, vj.dianshu, vj.laizi)
+		}
+	}
+	buf.Flush()
+}
+
+func GenAllPossibleAddPuZiToHandCards(t *testing.T, m1 map[int]*HuArray, handCards []int, jiang int, level int) {
+	if level <= 0 {
+
+		count++
+
+		key, distinctCards := calcHandCardsKey(handCards)
+		if _, ok := m1[key]; !ok {
+
+			arr := &HuArray{}
+
+			for laiziCard := range distinctCards {
+				laizi := []int{}
+				laizi = append(laizi, laiziCard)
+				ok, dianshu := kddmj.CanHuWithLaiZi(handCards, laizi)
+
+				ret := &HuRet{}
+				ret.handCards = make([]int, len(handCards))
+				copy(ret.handCards, handCards)
+				ret.hu = ok
+				ret.dianshu = dianshu
+				ret.laizi = laiziCard
+				arr.arr = append(arr.arr, ret)
+			}
+			m1[key] = arr
+		}
+
+		return
+	}
+
+	onePuZiChan := make(chan PuZi)
+	go genPuZi(onePuZiChan)
+	for one := range onePuZiChan {
+
+		var handCards1 = handCards
+		handCards1 = append(handCards1, one.PuZi[0])
+		handCards1 = append(handCards1, one.PuZi[1])
+		handCards1 = append(handCards1, one.PuZi[2])
+		if !kddmj.IsValidHandCards(handCards1) {
+			continue
+		}
+
+		GenAllPossibleAddPuZiToHandCards(t, m1, handCards1, jiang, level-1)
+	}
+}
+
+func calcHandCardsKey(handCards []int) (int, []int) {
+	var slots [kddmj.TILEMAX]int
+
+	var distinctCards []int
+	for _, c := range handCards {
+		slots[c]++
+		if slots[c] == 1 {
+			distinctCards = append(distinctCards, c)
+		}
+	}
+
+	sort.Ints(slots[:])
+
+	num := 0
+	for _, v := range slots {
+		num = num*10 + v
+	}
+
+	return num, distinctCards
 }
 
 // func getMaxOneCard(slots [kddmj.TILEMAX]int) (bool, int) {
