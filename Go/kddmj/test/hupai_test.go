@@ -597,3 +597,105 @@ func genPuZi(puziChan chan PuZi) {
 
 	close(puziChan)
 }
+
+// func getMaxOneCard(slots [kddmj.TILEMAX]int) (bool, int) {
+// 	for i := kddmj.TON; i <= kddmj.CHU; i++ {
+// 		if slots[i] == 1 {
+// 			return true, i
+// 		}
+// 	}
+
+// 	for i := 1; i <= 9; i++ {
+// 		var k1 = 1*9 - i
+// 		var k2 = 2*9 - i
+// 		var k3 = 3*9 - i
+
+// 		if slots[k1] > 1 || slots[k2] > 1 || slots[k3] > 1 {
+// 			return false, 0
+// 		}
+
+// 		count := 0
+// 		k := 0
+
+// 		if slots[k1] == 1 {
+// 			count++
+// 			k = k1
+// 		}
+
+// 		if slots[k2] == 1 {
+// 			count++
+// 			k = k2
+// 		}
+
+// 		if slots[k3] == 1 {
+// 			count++
+// 			k = k3
+// 		}
+
+// 		if count == 1 {
+// 			return true, k
+// 		} else if count > 1 {
+// 			return false, 0
+// 		}
+// 	}
+
+// 	return false, 0
+// }
+
+// func TestOneLaiZiForAll(t *testing.T) {
+// 	jiangChan := make(chan int)
+// 	go genJiang(jiangChan)
+// 	for jiang := range jiangChan {
+
+// 		handCards := []int{}
+// 		handCards = append(handCards, jiang)
+// 		handCards = append(handCards, jiang)
+
+// 		ret := OneLaiZiAddPuZiToHandCards(t, handCards, jiang, 4)
+// 		if !ret {
+// 			return
+// 		}
+// 	}
+// }
+
+// func OneLaiZiAddPuZiToHandCards(t *testing.T, handCards []int, jiang int, level int) bool {
+// 	if level <= 0 {
+
+// 		slots := kddmj.GenSlots(handCards)
+// 		ret, maxOneCard := getMaxOneCard(slots)
+// 		if ret {
+// 			laizi := []int{}
+// 			laizi = append(laizi, maxOneCard)
+// 			ok, dianshu := kddmj.CanHuWithLaiZi(handCards, laizi)
+// 			if !ok || dianshu != kddmj.DianShuTable[maxOneCard] {
+// 				fmt.Println("slots=", slots, ", maxOneCard=", maxOneCard,
+// 					"kddmj.DianShuTable[maxOneCard]=", kddmj.DianShuTable[maxOneCard], "dianshu=", dianshu, ", ")
+// 				kddmj.ShowHandCards(handCards)
+// 				t.Error("CanHu failed.")
+// 				return false
+// 			}
+// 		}
+
+// 		return true
+// 	}
+
+// 	onePuZiChan := make(chan PuZi)
+// 	go genPuZi(onePuZiChan)
+// 	for one := range onePuZiChan {
+
+// 		var handCards1 = handCards
+// 		handCards1 = append(handCards1, one.PuZi[0])
+// 		handCards1 = append(handCards1, one.PuZi[1])
+// 		handCards1 = append(handCards1, one.PuZi[2])
+// 		if !kddmj.IsValidHandCards(handCards1) {
+// 			continue
+// 		}
+
+// 		ret := OneLaiZiAddPuZiToHandCards(t, handCards1, jiang, level-1)
+// 		if !ret {
+// 			return false
+// 		}
+// 	}
+
+// 	return true
+// }
