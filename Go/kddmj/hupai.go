@@ -42,7 +42,31 @@ func CanHuWithLaiZi(handCards []int, laizi []int) (bool, int) {
 		return true, 10
 	}
 
-	var XuShu []int
+	XuShu, Zi := getArray(slots)
+
+	ret1, dianshu1 := walkThroughTable(laiziNum, XuShu, Zi, tableMgr.TableXuShuWithEye, tableMgr.TableXuShu, tableMgr.TableZi)
+
+	ret2, dianshu2 := walkThroughTable(laiziNum, Zi, XuShu, tableMgr.TableZiWithEye, tableMgr.TableZi, tableMgr.TableXuShu)
+
+	if ret1 && ret2 {
+		return true, max(dianshu1, dianshu2)
+	} else if !ret1 && ret2 {
+		return true, dianshu2
+	} else if ret1 && !ret2 {
+		return true, dianshu1
+	}
+
+	return false, 0
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func getArray(slots [TILEMAX]int) (XuShu []int, Zi []int) {
 	if getWan(slots) > 0 {
 		XuShu = append(XuShu, getWan(slots))
 	}
@@ -53,7 +77,6 @@ func CanHuWithLaiZi(handCards []int, laizi []int) (bool, int) {
 		XuShu = append(XuShu, getTong(slots))
 	}
 
-	var Zi []int
 	if getFeng(slots) > 0 {
 		Zi = append(Zi, getFeng(slots))
 	}
@@ -61,147 +84,97 @@ func CanHuWithLaiZi(handCards []int, laizi []int) (bool, int) {
 		Zi = append(Zi, getJian(slots))
 	}
 
+	return
+}
+
+func walkThroughTable(laiziNum int, jiangArray []int, commonArray []int,
+	jTableWithEye *Table, jTableNoEye *Table, cTableNoEye *Table) (bool, int) {
+
+	//保存最大的点数
 	var maxDianShu = 0
-	for i, iNum := range XuShu {
+
+	//保存当前这次计算时最大的点数
+	var curMaxDianShu = 0
+
+	var bCanHu = false
+
+	for i, iNum := range jiangArray {
 		success := true
 		hasLaiZiNum := laiziNum
 
 		//这里会把8个赖子全部遍历，但是没有必要，因为也许我一共也只有3个赖子。
-		dianShu, jiangNeedLaiZiNum, ok := tableMgr.TableXuShuWithEye.IsInTable(iNum)
+		dianShu, jiangNeedLaiZiNum, ok := jTableWithEye.IsInTable(iNum)
 		if !ok || jiangNeedLaiZiNum > hasLaiZiNum {
 			continue
 		}
 		hasLaiZiNum -= jiangNeedLaiZiNum
 		if jiangNeedLaiZiNum > 0 {
-			maxDianShu = dianShu
+			curMaxDianShu = dianShu
 		}
 
-		for j, jNum := range XuShu {
+		for j, jNum := range jiangArray {
 			if i == j {
 				continue
 			}
-			dianShu, needLaiZiNum, ok := tableMgr.TableXuShu.IsInTable(jNum)
+			dianShu, needLaiZiNum, ok := jTableNoEye.IsInTable(jNum)
 			if !ok || needLaiZiNum > hasLaiZiNum {
 				success = false
 				break
 			}
 			hasLaiZiNum -= needLaiZiNum
-			if needLaiZiNum > 0 && dianShu > maxDianShu {
-				maxDianShu = dianShu
+			if needLaiZiNum > 0 && dianShu > curMaxDianShu {
+				curMaxDianShu = dianShu
 			}
 		}
 		if !success {
 			continue
 		}
 
-		for _, num := range Zi {
-			dianShu, needLaiZiNum, ok := tableMgr.TableZi.IsInTable(num)
+		for _, num := range commonArray {
+			dianShu, needLaiZiNum, ok := cTableNoEye.IsInTable(num)
 			if !ok || needLaiZiNum > hasLaiZiNum {
 				success = false
 				break
 			}
 			hasLaiZiNum -= needLaiZiNum
-			if needLaiZiNum > 0 && dianShu > maxDianShu {
-				maxDianShu = dianShu
+			if needLaiZiNum > 0 && dianShu > curMaxDianShu {
+				curMaxDianShu = dianShu
 			}
 		}
 		if !success {
 			continue
 		}
 
-		if hasLaiZiNum >= 3 || maxDianShu == 10 {
+		if hasLaiZiNum >= 3 || curMaxDianShu == 10 {
 			return true, 10
 		}
 
 		if jiangNeedLaiZiNum == 2 {
-			_, ok := tableMgr.TableXuShu.IsInTableMap(iNum, 0)
+			_, ok := jTableNoEye.IsInTableMap(iNum, 0)
 			if ok {
 				return true, 10
 			}
 		} else if jiangNeedLaiZiNum == 3 {
-			_, ok := tableMgr.TableXuShu.IsInTableMap(iNum, 1)
+			_, ok := jTableNoEye.IsInTableMap(iNum, 1)
 			if ok {
 				return true, 10
 			}
 		} else if jiangNeedLaiZiNum == 4 {
-			_, ok := tableMgr.TableXuShu.IsInTableMap(iNum, 2)
+			_, ok := jTableNoEye.IsInTableMap(iNum, 2)
 			if ok {
 				return true, 10
 			}
 		}
 
-		return true, maxDianShu
+		if curMaxDianShu > maxDianShu {
+			maxDianShu = curMaxDianShu
+		}
+		bCanHu = true
 	}
 
-	for i, iNum := range Zi {
-		success := true
-		hasLaiZiNum := laiziNum
-		dianShu, jiangNeedLaiZiNum, ok := tableMgr.TableZiWithEye.IsInTable(iNum)
-		if !ok || jiangNeedLaiZiNum > hasLaiZiNum {
-			continue
-		}
-		hasLaiZiNum -= jiangNeedLaiZiNum
-		if jiangNeedLaiZiNum > 0 {
-			maxDianShu = dianShu
-		}
-
-		for j, jNum := range Zi {
-			if i == j {
-				continue
-			}
-			dianShu, needLaiZiNum, ok := tableMgr.TableZi.IsInTable(jNum)
-			if !ok || needLaiZiNum > hasLaiZiNum {
-				success = false
-				break
-			}
-			hasLaiZiNum -= needLaiZiNum
-			if needLaiZiNum > 0 && dianShu > maxDianShu {
-				maxDianShu = dianShu
-			}
-		}
-		if !success {
-			continue
-		}
-
-		for _, num := range XuShu {
-			dianShu, needLaiZiNum, ok := tableMgr.TableXuShu.IsInTable(num)
-			if !ok || needLaiZiNum > hasLaiZiNum {
-				success = false
-				break
-			}
-			hasLaiZiNum -= needLaiZiNum
-			if needLaiZiNum > 0 && dianShu > maxDianShu {
-				maxDianShu = dianShu
-			}
-		}
-		if !success {
-			continue
-		}
-
-		if hasLaiZiNum >= 3 || maxDianShu == 10 {
-			return true, 10
-		}
-
-		if jiangNeedLaiZiNum == 2 {
-			_, ok := tableMgr.TableZi.IsInTableMap(iNum, 0)
-			if ok {
-				return true, 10
-			}
-		} else if jiangNeedLaiZiNum == 3 {
-			_, ok := tableMgr.TableZi.IsInTableMap(iNum, 1)
-			if ok {
-				return true, 10
-			}
-		} else if jiangNeedLaiZiNum == 4 {
-			_, ok := tableMgr.TableZi.IsInTableMap(iNum, 2)
-			if ok {
-				return true, 10
-			}
-		}
-
+	if bCanHu {
 		return true, maxDianShu
 	}
-
 	return false, 0
 }
 
@@ -459,3 +432,50 @@ func ShowHandCards(handCards []int) {
 
 表生成耗时：2-3S
 */
+var (
+	DianShuTable = make(map[int]int)
+)
+
+func init() {
+	initDianShuTable()
+}
+
+func initDianShuTable() {
+	DianShuTable[0] = 1
+	DianShuTable[1] = 2
+	DianShuTable[2] = 3
+	DianShuTable[3] = 4
+	DianShuTable[4] = 5
+	DianShuTable[5] = 6
+	DianShuTable[6] = 7
+	DianShuTable[7] = 8
+	DianShuTable[8] = 9
+
+	DianShuTable[9] = 1
+	DianShuTable[10] = 2
+	DianShuTable[11] = 3
+	DianShuTable[12] = 4
+	DianShuTable[13] = 5
+	DianShuTable[14] = 6
+	DianShuTable[15] = 7
+	DianShuTable[16] = 8
+	DianShuTable[17] = 9
+
+	DianShuTable[18] = 1
+	DianShuTable[19] = 2
+	DianShuTable[20] = 3
+	DianShuTable[21] = 4
+	DianShuTable[22] = 5
+	DianShuTable[23] = 6
+	DianShuTable[24] = 7
+	DianShuTable[25] = 8
+	DianShuTable[26] = 9
+
+	DianShuTable[27] = 10
+	DianShuTable[28] = 10
+	DianShuTable[29] = 10
+	DianShuTable[30] = 10
+	DianShuTable[31] = 10
+	DianShuTable[32] = 10
+	DianShuTable[33] = 10
+}
