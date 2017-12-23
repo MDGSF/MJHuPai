@@ -1,0 +1,25 @@
+$ go test hupai_test.go -v -timeout 3h
+=== RUN   Test1
+--- PASS: Test1 (0.00s)
+=== RUN   TestLaiZi
+--- PASS: TestLaiZi (0.00s)
+=== RUN   TestOneJiang
+--- PASS: TestOneJiang (0.00s)
+=== RUN   TestOneJiangWithOnePu
+--- PASS: TestOneJiangWithOnePu (0.00s)
+=== RUN   TestOneJiangWithTwoPu
+--- PASS: TestOneJiangWithTwoPu (0.03s)
+=== RUN   TestOneJiangWithThreePu
+--- PASS: TestOneJiangWithThreePu (7.94s)
+        hupai_test.go:197: count =  0
+        hupai_test.go:256: count =  5157462
+=== RUN   TestOneJiangWithFourPu
+--- PASS: TestOneJiangWithFourPu (396.17s)
+        hupai_test.go:262: count =  0
+        hupai_test.go:335: count =  266667093
+=== RUN   TestLaiZiOneJiangWithFourPu
+--- PASS: TestLaiZiOneJiangWithFourPu (416.73s)
+        hupai_test.go:341: count =  0
+        hupai_test.go:419: count =  266667093
+PASS
+ok      command-line-arguments  823.428s
