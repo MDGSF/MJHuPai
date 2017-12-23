@@ -1,4 +1,4 @@
-package kddmj
+package sxtdhmj
 
 //TableMgr 表管理工具
 type TableMgr struct {
@@ -21,16 +21,16 @@ func NewTableMgr() *TableMgr {
 //Load 加载所有的表到内存中。
 func (tableMgr *TableMgr) Load(directory string) {
 
-	tableMgr.TableXuShu.Load(directory + "tbl/tableXuShu")
-	tableMgr.TableXuShuWithEye.Load(directory + "tbl/tableEyeXuShu")
-	tableMgr.TableZi.Load(directory + "tbl/tableZi")
-	tableMgr.TableZiWithEye.Load(directory + "tbl/tableEyeZi")
+	tableMgr.TableXuShu.Load(directory + "sxtdh_tbl/tableXuShu")
+	tableMgr.TableXuShuWithEye.Load(directory + "sxtdh_tbl/tableEyeXuShu")
+	tableMgr.TableZi.Load(directory + "sxtdh_tbl/tableZi")
+	tableMgr.TableZiWithEye.Load(directory + "sxtdh_tbl/tableEyeZi")
 }
 
 //Dump 固化所有内存中的表
 func (tableMgr *TableMgr) Dump() {
-	tableMgr.TableXuShu.Dump("tbl/tableXuShu")
-	tableMgr.TableXuShuWithEye.Dump("tbl/tableEyeXuShu")
-	tableMgr.TableZi.Dump("tbl/tableZi")
-	tableMgr.TableZiWithEye.Dump("tbl/tableEyeZi")
+	tableMgr.TableXuShu.Dump("sxtdh_tbl/tableXuShu")
+	tableMgr.TableXuShuWithEye.Dump("sxtdh_tbl/tableEyeXuShu")
+	tableMgr.TableZi.Dump("sxtdh_tbl/tableZi")
+	tableMgr.TableZiWithEye.Dump("sxtdh_tbl/tableEyeZi")
 }

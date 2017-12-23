@@ -1,4 +1,4 @@
-package kddmj
+package sxtdhmj
 
 import (
 	"fmt"
@@ -8,8 +8,8 @@ var tableMgr *TableMgr
 
 func init() {
 	tableMgr = NewTableMgr()
-	//tableMgr.Load("E:\\Go\\GOPATH\\src\\github.com\\MDGSF\\MJHuPai\\Go\\kddmj\\genTable\\")
-	tableMgr.Load(".\\")
+	//tableMgr.Load("E:\\Go\\GOPATH\\src\\github.com\\MDGSF\\MJHuPai\\Go\\sxtdhmj\\genTable\\")
+	//tableMgr.Load(".\\")
 }
 
 /*

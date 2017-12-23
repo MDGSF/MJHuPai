@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/MDGSF/MJHuPai/Go/kddmj"
+	"github.com/MDGSF/MJHuPai/Go/sxtdhmj"
 )
 
 type reqHandCards struct {
@@ -35,7 +35,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(msgBag)
 
-	ret, dianshu := kddmj.CanHuWithLaiZi(msgBag.HandCards, msgBag.Laizi)
+	ret, dianshu := sxtdhmj.CanHuWithLaiZi(msgBag.HandCards, msgBag.Laizi)
 
 	fmt.Println(ret, dianshu)
 

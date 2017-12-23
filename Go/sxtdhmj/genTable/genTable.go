@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/MDGSF/MJHuPai/Go/kddmj"
+	"github.com/MDGSF/MJHuPai/Go/sxtdhmj"
 )
 
 const laiZiNum = 9
 
 //只保存最终正确的结果。
-var tableMgr *kddmj.TableMgr
+var tableMgr *sxtdhmj.TableMgr
 
 //除了保存最终正确的结果，还要把中间计算过的错误结果也保存起来，防止重复计算。
 var tableXuShuTemp [laiZiNum]*map[int]int
@@ -25,7 +25,7 @@ func main() {
 
 	fmt.Println("main start")
 
-	tableMgr = kddmj.NewTableMgr()
+	tableMgr = sxtdhmj.NewTableMgr()
 
 	for i := 0; i < laiZiNum; i++ {
 		tableXuShuTemp[i] = &map[int]int{}

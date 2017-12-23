@@ -8,13 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/MDGSF/MJHuPai/Go/kddmj"
+	"github.com/MDGSF/MJHuPai/Go/sxtdhmj"
 )
 
 func Test1(t *testing.T) {
 	handCards := []int{31, 31}
-	if !kddmj.CanHu(handCards) {
-		kddmj.ShowHandCards(handCards)
+	if !sxtdhmj.CanHu(handCards) {
+		sxtdhmj.ShowHandCards(handCards)
 		t.Error("CanHu failed.")
 	}
 }
@@ -22,21 +22,21 @@ func Test1(t *testing.T) {
 func TestLaiZi(t *testing.T) {
 	handCards := []int{0, 0, 1, 2, 3}
 	laizi := []int{9}
-	ok, _ := kddmj.CanHuWithLaiZi(handCards, laizi)
+	ok, _ := sxtdhmj.CanHuWithLaiZi(handCards, laizi)
 	if !ok {
-		kddmj.ShowHandCards(handCards)
+		sxtdhmj.ShowHandCards(handCards)
 		t.Error("CanHu failed.")
 	}
 }
 
 func TestOneJiang(t *testing.T) {
-	for i := kddmj.MAN; i <= kddmj.CHU; i++ {
-		if kddmj.IsValidCard(int(i)) {
+	for i := sxtdhmj.MAN; i <= sxtdhmj.CHU; i++ {
+		if sxtdhmj.IsValidCard(int(i)) {
 			handCards := []int{}
 			handCards = append(handCards, int(i))
 			handCards = append(handCards, int(i))
-			if !kddmj.CanHu(handCards) {
-				kddmj.ShowHandCards(handCards)
+			if !sxtdhmj.CanHu(handCards) {
+				sxtdhmj.ShowHandCards(handCards)
 				t.Error("CanHu failed.")
 			}
 		}
@@ -44,8 +44,8 @@ func TestOneJiang(t *testing.T) {
 }
 
 func TestOneJiangWithOnePu(t *testing.T) {
-	for i := kddmj.MAN; i <= kddmj.CHU; i++ {
-		if !kddmj.IsValidCard(int(i)) {
+	for i := sxtdhmj.MAN; i <= sxtdhmj.CHU; i++ {
+		if !sxtdhmj.IsValidCard(int(i)) {
 			continue
 		}
 
@@ -53,8 +53,8 @@ func TestOneJiangWithOnePu(t *testing.T) {
 		handCards = append(handCards, int(i))
 		handCards = append(handCards, int(i))
 
-		for j := kddmj.MAN; j <= kddmj.CHU; j++ {
-			if !kddmj.IsValidCard(int(j)) {
+		for j := sxtdhmj.MAN; j <= sxtdhmj.CHU; j++ {
+			if !sxtdhmj.IsValidCard(int(j)) {
 				continue
 			}
 			if j == i {
@@ -67,16 +67,16 @@ func TestOneJiangWithOnePu(t *testing.T) {
 			handCardsTemp = append(handCardsTemp, int(j))
 			handCardsTemp = append(handCardsTemp, int(j))
 
-			if !kddmj.CanHu(handCardsTemp) {
-				kddmj.ShowHandCards(handCardsTemp)
+			if !sxtdhmj.CanHu(handCardsTemp) {
+				sxtdhmj.ShowHandCards(handCardsTemp)
 				t.Error("CanHu failed.")
 			}
 		}
 
-		for j := kddmj.MAN; j <= kddmj.CHU; j++ {
-			if !((kddmj.IsCharacter(j) && kddmj.IsCharacter(j+1) && kddmj.IsCharacter(j+2)) ||
-				(kddmj.IsBamboo(j) && kddmj.IsBamboo(j+1) && kddmj.IsBamboo(j+2)) ||
-				(kddmj.IsDot(j) && kddmj.IsDot(j+1) && kddmj.IsDot(j+2))) {
+		for j := sxtdhmj.MAN; j <= sxtdhmj.CHU; j++ {
+			if !((sxtdhmj.IsCharacter(j) && sxtdhmj.IsCharacter(j+1) && sxtdhmj.IsCharacter(j+2)) ||
+				(sxtdhmj.IsBamboo(j) && sxtdhmj.IsBamboo(j+1) && sxtdhmj.IsBamboo(j+2)) ||
+				(sxtdhmj.IsDot(j) && sxtdhmj.IsDot(j+1) && sxtdhmj.IsDot(j+2))) {
 				continue
 			}
 
@@ -86,8 +86,8 @@ func TestOneJiangWithOnePu(t *testing.T) {
 			handCardsTemp = append(handCardsTemp, int(j+1))
 			handCardsTemp = append(handCardsTemp, int(j+2))
 
-			if !kddmj.CanHu(handCardsTemp) {
-				kddmj.ShowHandCards(handCardsTemp)
+			if !sxtdhmj.CanHu(handCardsTemp) {
+				sxtdhmj.ShowHandCards(handCardsTemp)
 				t.Error("CanHu failed.")
 			}
 		}
@@ -95,8 +95,8 @@ func TestOneJiangWithOnePu(t *testing.T) {
 }
 
 func TestOneJiangWithTwoPu(t *testing.T) {
-	for i := kddmj.MAN; i <= kddmj.CHU; i++ {
-		if !kddmj.IsValidCard(int(i)) {
+	for i := sxtdhmj.MAN; i <= sxtdhmj.CHU; i++ {
+		if !sxtdhmj.IsValidCard(int(i)) {
 			continue
 		}
 
@@ -104,8 +104,8 @@ func TestOneJiangWithTwoPu(t *testing.T) {
 		handCards = append(handCards, int(i))
 		handCards = append(handCards, int(i))
 
-		for j := kddmj.MAN; j <= kddmj.CHU; j++ {
-			if !kddmj.IsValidCard(int(j)) {
+		for j := sxtdhmj.MAN; j <= sxtdhmj.CHU; j++ {
+			if !sxtdhmj.IsValidCard(int(j)) {
 				continue
 			}
 
@@ -113,12 +113,12 @@ func TestOneJiangWithTwoPu(t *testing.T) {
 			handCardsj = append(handCardsj, int(j))
 			handCardsj = append(handCardsj, int(j))
 			handCardsj = append(handCardsj, int(j))
-			if !kddmj.IsValidHandCards(handCardsj) {
+			if !sxtdhmj.IsValidHandCards(handCardsj) {
 				continue
 			}
 
-			for k := kddmj.MAN; k <= kddmj.CHU; k++ {
-				if !kddmj.IsValidCard(int(j)) {
+			for k := sxtdhmj.MAN; k <= sxtdhmj.CHU; k++ {
+				if !sxtdhmj.IsValidCard(int(j)) {
 					continue
 				}
 
@@ -126,20 +126,20 @@ func TestOneJiangWithTwoPu(t *testing.T) {
 				handCardsk = append(handCardsk, int(k))
 				handCardsk = append(handCardsk, int(k))
 				handCardsk = append(handCardsk, int(k))
-				if !kddmj.IsValidHandCards(handCardsk) {
+				if !sxtdhmj.IsValidHandCards(handCardsk) {
 					continue
 				}
 
-				if !kddmj.CanHu(handCardsk) {
-					kddmj.ShowHandCards(handCardsk)
+				if !sxtdhmj.CanHu(handCardsk) {
+					sxtdhmj.ShowHandCards(handCardsk)
 					t.Error("CanHu failed.")
 				}
 			}
 
-			for k := kddmj.MAN; k <= kddmj.CHU; k++ {
-				if !((kddmj.IsCharacter(k) && kddmj.IsCharacter(k+1) && kddmj.IsCharacter(k+2)) ||
-					(kddmj.IsBamboo(k) && kddmj.IsBamboo(k+1) && kddmj.IsBamboo(k+2)) ||
-					(kddmj.IsDot(k) && kddmj.IsDot(k+1) && kddmj.IsDot(k+2))) {
+			for k := sxtdhmj.MAN; k <= sxtdhmj.CHU; k++ {
+				if !((sxtdhmj.IsCharacter(k) && sxtdhmj.IsCharacter(k+1) && sxtdhmj.IsCharacter(k+2)) ||
+					(sxtdhmj.IsBamboo(k) && sxtdhmj.IsBamboo(k+1) && sxtdhmj.IsBamboo(k+2)) ||
+					(sxtdhmj.IsDot(k) && sxtdhmj.IsDot(k+1) && sxtdhmj.IsDot(k+2))) {
 					continue
 				}
 
@@ -147,21 +147,21 @@ func TestOneJiangWithTwoPu(t *testing.T) {
 				handCardsk = append(handCardsk, int(k))
 				handCardsk = append(handCardsk, int(k+1))
 				handCardsk = append(handCardsk, int(k+2))
-				if !kddmj.IsValidHandCards(handCardsk) {
+				if !sxtdhmj.IsValidHandCards(handCardsk) {
 					continue
 				}
 
-				if !kddmj.CanHu(handCardsk) {
-					kddmj.ShowHandCards(handCardsk)
+				if !sxtdhmj.CanHu(handCardsk) {
+					sxtdhmj.ShowHandCards(handCardsk)
 					t.Error("CanHu failed.")
 				}
 			}
 		}
 
-		for j := kddmj.MAN; j <= kddmj.CHU; j++ {
-			if !((kddmj.IsCharacter(j) && kddmj.IsCharacter(j+1) && kddmj.IsCharacter(j+2)) ||
-				(kddmj.IsBamboo(j) && kddmj.IsBamboo(j+1) && kddmj.IsBamboo(j+2)) ||
-				(kddmj.IsDot(j) && kddmj.IsDot(j+1) && kddmj.IsDot(j+2))) {
+		for j := sxtdhmj.MAN; j <= sxtdhmj.CHU; j++ {
+			if !((sxtdhmj.IsCharacter(j) && sxtdhmj.IsCharacter(j+1) && sxtdhmj.IsCharacter(j+2)) ||
+				(sxtdhmj.IsBamboo(j) && sxtdhmj.IsBamboo(j+1) && sxtdhmj.IsBamboo(j+2)) ||
+				(sxtdhmj.IsDot(j) && sxtdhmj.IsDot(j+1) && sxtdhmj.IsDot(j+2))) {
 				continue
 			}
 
@@ -169,14 +169,14 @@ func TestOneJiangWithTwoPu(t *testing.T) {
 			handCardsj = append(handCardsj, int(j))
 			handCardsj = append(handCardsj, int(j+1))
 			handCardsj = append(handCardsj, int(j+2))
-			if !kddmj.IsValidHandCards(handCardsj) {
+			if !sxtdhmj.IsValidHandCards(handCardsj) {
 				continue
 			}
 
-			for k := kddmj.MAN; k <= kddmj.CHU; k++ {
-				if !((kddmj.IsCharacter(k) && kddmj.IsCharacter(k+1) && kddmj.IsCharacter(k+2)) ||
-					(kddmj.IsBamboo(k) && kddmj.IsBamboo(k+1) && kddmj.IsBamboo(k+2)) ||
-					(kddmj.IsDot(k) && kddmj.IsDot(k+1) && kddmj.IsDot(k+2))) {
+			for k := sxtdhmj.MAN; k <= sxtdhmj.CHU; k++ {
+				if !((sxtdhmj.IsCharacter(k) && sxtdhmj.IsCharacter(k+1) && sxtdhmj.IsCharacter(k+2)) ||
+					(sxtdhmj.IsBamboo(k) && sxtdhmj.IsBamboo(k+1) && sxtdhmj.IsBamboo(k+2)) ||
+					(sxtdhmj.IsDot(k) && sxtdhmj.IsDot(k+1) && sxtdhmj.IsDot(k+2))) {
 					continue
 				}
 
@@ -184,12 +184,12 @@ func TestOneJiangWithTwoPu(t *testing.T) {
 				handCardsk = append(handCardsk, int(k))
 				handCardsk = append(handCardsk, int(k+1))
 				handCardsk = append(handCardsk, int(k+2))
-				if !kddmj.IsValidHandCards(handCardsk) {
+				if !sxtdhmj.IsValidHandCards(handCardsk) {
 					continue
 				}
 
-				if !kddmj.CanHu(handCardsk) {
-					kddmj.ShowHandCards(handCardsk)
+				if !sxtdhmj.CanHu(handCardsk) {
+					sxtdhmj.ShowHandCards(handCardsk)
 					t.Error("CanHu failed.")
 				}
 			}
@@ -218,7 +218,7 @@ func TestOneJiangWithThreePu(t *testing.T) {
 			handCards1 = append(handCards1, one.PuZi[0])
 			handCards1 = append(handCards1, one.PuZi[1])
 			handCards1 = append(handCards1, one.PuZi[2])
-			if !kddmj.IsValidHandCards(handCards1) {
+			if !sxtdhmj.IsValidHandCards(handCards1) {
 				continue
 			}
 
@@ -230,7 +230,7 @@ func TestOneJiangWithThreePu(t *testing.T) {
 				handCards2 = append(handCards2, two.PuZi[0])
 				handCards2 = append(handCards2, two.PuZi[1])
 				handCards2 = append(handCards2, two.PuZi[2])
-				if !kddmj.IsValidHandCards(handCards2) {
+				if !sxtdhmj.IsValidHandCards(handCards2) {
 					continue
 				}
 
@@ -242,14 +242,14 @@ func TestOneJiangWithThreePu(t *testing.T) {
 					handCards3 = append(handCards3, three.PuZi[0])
 					handCards3 = append(handCards3, three.PuZi[1])
 					handCards3 = append(handCards3, three.PuZi[2])
-					if !kddmj.IsValidHandCards(handCards3) {
+					if !sxtdhmj.IsValidHandCards(handCards3) {
 						continue
 					}
 
 					count++
 
-					if !kddmj.CanHu(handCards3) {
-						kddmj.ShowHandCards(handCards3)
+					if !sxtdhmj.CanHu(handCards3) {
+						sxtdhmj.ShowHandCards(handCards3)
 						t.Error("CanHu failed.")
 					}
 				}
@@ -283,7 +283,7 @@ func TestOneJiangWithFourPu(t *testing.T) {
 			handCards1 = append(handCards1, one.PuZi[0])
 			handCards1 = append(handCards1, one.PuZi[1])
 			handCards1 = append(handCards1, one.PuZi[2])
-			if !kddmj.IsValidHandCards(handCards1) {
+			if !sxtdhmj.IsValidHandCards(handCards1) {
 				continue
 			}
 
@@ -295,7 +295,7 @@ func TestOneJiangWithFourPu(t *testing.T) {
 				handCards2 = append(handCards2, two.PuZi[0])
 				handCards2 = append(handCards2, two.PuZi[1])
 				handCards2 = append(handCards2, two.PuZi[2])
-				if !kddmj.IsValidHandCards(handCards2) {
+				if !sxtdhmj.IsValidHandCards(handCards2) {
 					continue
 				}
 
@@ -307,7 +307,7 @@ func TestOneJiangWithFourPu(t *testing.T) {
 					handCards3 = append(handCards3, three.PuZi[0])
 					handCards3 = append(handCards3, three.PuZi[1])
 					handCards3 = append(handCards3, three.PuZi[2])
-					if !kddmj.IsValidHandCards(handCards3) {
+					if !sxtdhmj.IsValidHandCards(handCards3) {
 						continue
 					}
 
@@ -319,14 +319,14 @@ func TestOneJiangWithFourPu(t *testing.T) {
 						handCards4 = append(handCards4, four.PuZi[0])
 						handCards4 = append(handCards4, four.PuZi[1])
 						handCards4 = append(handCards4, four.PuZi[2])
-						if !kddmj.IsValidHandCards(handCards4) {
+						if !sxtdhmj.IsValidHandCards(handCards4) {
 							continue
 						}
 
 						count++
 
-						if !kddmj.CanHu(handCards4) {
-							kddmj.ShowHandCards(handCards4)
+						if !sxtdhmj.CanHu(handCards4) {
+							sxtdhmj.ShowHandCards(handCards4)
 							t.Error("CanHu failed.")
 						}
 					}
@@ -342,15 +342,15 @@ func TestOneJiangWithFourPu(t *testing.T) {
 }
 
 func TestLaiZiOneJiang1(t *testing.T) {
-	for i := kddmj.MAN; i <= kddmj.CHU; i++ {
-		if kddmj.IsValidCard(int(i)) {
+	for i := sxtdhmj.MAN; i <= sxtdhmj.CHU; i++ {
+		if sxtdhmj.IsValidCard(int(i)) {
 			handCards := []int{}
 			handCards = append(handCards, int(i))
 			handCards = append(handCards, int(i))
 			laizi := []int{}
-			ok, dianshu := kddmj.CanHuWithLaiZi(handCards, laizi)
+			ok, dianshu := sxtdhmj.CanHuWithLaiZi(handCards, laizi)
 			if !ok || dianshu != 0 {
-				kddmj.ShowHandCards(handCards)
+				sxtdhmj.ShowHandCards(handCards)
 				t.Error("CanHu failed.")
 			}
 		}
@@ -358,16 +358,16 @@ func TestLaiZiOneJiang1(t *testing.T) {
 }
 
 func TestLaiZiOneJiang2(t *testing.T) {
-	for i := kddmj.MAN; i <= kddmj.CHU; i++ {
-		if kddmj.IsValidCard(int(i)) {
+	for i := sxtdhmj.MAN; i <= sxtdhmj.CHU; i++ {
+		if sxtdhmj.IsValidCard(int(i)) {
 			handCards := []int{}
 			handCards = append(handCards, int(i))
 			handCards = append(handCards, int(i))
 			laizi := []int{}
 			laizi = append(laizi, int(i))
-			ok, dianshu := kddmj.CanHuWithLaiZi(handCards, laizi)
+			ok, dianshu := sxtdhmj.CanHuWithLaiZi(handCards, laizi)
 			if !ok || dianshu != 10 {
-				kddmj.ShowHandCards(handCards)
+				sxtdhmj.ShowHandCards(handCards)
 				t.Error("CanHu failed.")
 			}
 		}
@@ -391,15 +391,15 @@ func TestLaiZiOneJiangWithOnePu1(t *testing.T) {
 			handCards1 = append(handCards1, one.PuZi[0])
 			handCards1 = append(handCards1, one.PuZi[1])
 			handCards1 = append(handCards1, one.PuZi[2])
-			if !kddmj.IsValidHandCards(handCards1) {
+			if !sxtdhmj.IsValidHandCards(handCards1) {
 				continue
 			}
 
 			laizi := []int{}
 			laizi = append(laizi, jiang)
-			ok, dianshu := kddmj.CanHuWithLaiZi(handCards1, laizi)
+			ok, dianshu := sxtdhmj.CanHuWithLaiZi(handCards1, laizi)
 			if !ok || dianshu != 10 {
-				kddmj.ShowHandCards(handCards1)
+				sxtdhmj.ShowHandCards(handCards1)
 				t.Error("CanHu failed.")
 			}
 		}
@@ -458,9 +458,9 @@ func AddPuZiToHandCards(t *testing.T, handCards []int, jiang int, level int) {
 		count++
 		laizi := []int{}
 		laizi = append(laizi, jiang)
-		ok, dianshu := kddmj.CanHuWithLaiZi(handCards, laizi)
+		ok, dianshu := sxtdhmj.CanHuWithLaiZi(handCards, laizi)
 		if !ok || dianshu != 10 {
-			kddmj.ShowHandCards(handCards)
+			sxtdhmj.ShowHandCards(handCards)
 			t.Error("CanHu failed.")
 		}
 		return
@@ -474,7 +474,7 @@ func AddPuZiToHandCards(t *testing.T, handCards []int, jiang int, level int) {
 		handCards1 = append(handCards1, one.PuZi[0])
 		handCards1 = append(handCards1, one.PuZi[1])
 		handCards1 = append(handCards1, one.PuZi[2])
-		if !kddmj.IsValidHandCards(handCards1) {
+		if !sxtdhmj.IsValidHandCards(handCards1) {
 			continue
 		}
 
@@ -503,7 +503,7 @@ func TestLaiZiOneJiangWithFourPu2(t *testing.T) {
 			handCards1 = append(handCards1, one.PuZi[0])
 			handCards1 = append(handCards1, one.PuZi[1])
 			handCards1 = append(handCards1, one.PuZi[2])
-			if !kddmj.IsValidHandCards(handCards1) {
+			if !sxtdhmj.IsValidHandCards(handCards1) {
 				continue
 			}
 
@@ -515,7 +515,7 @@ func TestLaiZiOneJiangWithFourPu2(t *testing.T) {
 				handCards2 = append(handCards2, two.PuZi[0])
 				handCards2 = append(handCards2, two.PuZi[1])
 				handCards2 = append(handCards2, two.PuZi[2])
-				if !kddmj.IsValidHandCards(handCards2) {
+				if !sxtdhmj.IsValidHandCards(handCards2) {
 					continue
 				}
 
@@ -527,7 +527,7 @@ func TestLaiZiOneJiangWithFourPu2(t *testing.T) {
 					handCards3 = append(handCards3, three.PuZi[0])
 					handCards3 = append(handCards3, three.PuZi[1])
 					handCards3 = append(handCards3, three.PuZi[2])
-					if !kddmj.IsValidHandCards(handCards3) {
+					if !sxtdhmj.IsValidHandCards(handCards3) {
 						continue
 					}
 
@@ -539,18 +539,18 @@ func TestLaiZiOneJiangWithFourPu2(t *testing.T) {
 						handCards4 = append(handCards4, four.PuZi[0])
 						handCards4 = append(handCards4, four.PuZi[1])
 						handCards4 = append(handCards4, four.PuZi[2])
-						if !kddmj.IsValidHandCards(handCards4) {
+						if !sxtdhmj.IsValidHandCards(handCards4) {
 							continue
 						}
 
 						count++
 
-						//for i := 1; i <= kddmj.MaxCard; i++ {
+						//for i := 1; i <= sxtdhmj.MaxCard; i++ {
 						laizi := []int{0x01}
 						//laizi = append(laizi, int(i))
-						ok, _ := kddmj.CanHuWithLaiZi(handCards4, laizi)
+						ok, _ := sxtdhmj.CanHuWithLaiZi(handCards4, laizi)
 						if !ok {
-							kddmj.ShowHandCards(handCards4)
+							sxtdhmj.ShowHandCards(handCards4)
 							t.Error("CanHu failed.")
 						}
 						//}
@@ -568,8 +568,8 @@ func TestLaiZiOneJiangWithFourPu2(t *testing.T) {
 }
 
 func genJiang(jiangChan chan int) {
-	for i := kddmj.MAN; i <= kddmj.CHU; i++ {
-		if !kddmj.IsValidCard(int(i)) {
+	for i := sxtdhmj.MAN; i <= sxtdhmj.CHU; i++ {
+		if !sxtdhmj.IsValidCard(int(i)) {
 			continue
 		}
 
@@ -583,8 +583,8 @@ type PuZi struct {
 }
 
 func genPuZi(puziChan chan PuZi) {
-	for i := kddmj.MAN; i <= kddmj.CHU; i++ {
-		if !kddmj.IsValidCard(int(i)) {
+	for i := sxtdhmj.MAN; i <= sxtdhmj.CHU; i++ {
+		if !sxtdhmj.IsValidCard(int(i)) {
 			continue
 		}
 
@@ -595,10 +595,10 @@ func genPuZi(puziChan chan PuZi) {
 		puziChan <- pu
 	}
 
-	for i := kddmj.MAN; i <= kddmj.CHU; i++ {
-		if !((kddmj.IsCharacter(i) && kddmj.IsCharacter(i+1) && kddmj.IsCharacter(i+2)) ||
-			(kddmj.IsBamboo(i) && kddmj.IsBamboo(i+1) && kddmj.IsBamboo(i+2)) ||
-			(kddmj.IsDot(i) && kddmj.IsDot(i+1) && kddmj.IsDot(i+2))) {
+	for i := sxtdhmj.MAN; i <= sxtdhmj.CHU; i++ {
+		if !((sxtdhmj.IsCharacter(i) && sxtdhmj.IsCharacter(i+1) && sxtdhmj.IsCharacter(i+2)) ||
+			(sxtdhmj.IsBamboo(i) && sxtdhmj.IsBamboo(i+1) && sxtdhmj.IsBamboo(i+2)) ||
+			(sxtdhmj.IsDot(i) && sxtdhmj.IsDot(i+1) && sxtdhmj.IsDot(i+2))) {
 			continue
 		}
 
@@ -660,7 +660,7 @@ func GenAllPossibleAddPuZiToHandCards(t *testing.T, m1 map[int]*HuArray, handCar
 			for laiziCard := range distinctCards {
 				laizi := []int{}
 				laizi = append(laizi, laiziCard)
-				ok, dianshu := kddmj.CanHuWithLaiZi(handCards, laizi)
+				ok, dianshu := sxtdhmj.CanHuWithLaiZi(handCards, laizi)
 
 				ret := &HuRet{}
 				ret.handCards = make([]int, len(handCards))
@@ -684,7 +684,7 @@ func GenAllPossibleAddPuZiToHandCards(t *testing.T, m1 map[int]*HuArray, handCar
 		handCards1 = append(handCards1, one.PuZi[0])
 		handCards1 = append(handCards1, one.PuZi[1])
 		handCards1 = append(handCards1, one.PuZi[2])
-		if !kddmj.IsValidHandCards(handCards1) {
+		if !sxtdhmj.IsValidHandCards(handCards1) {
 			continue
 		}
 
@@ -693,7 +693,7 @@ func GenAllPossibleAddPuZiToHandCards(t *testing.T, m1 map[int]*HuArray, handCar
 }
 
 func calcHandCardsKey(handCards []int) (int, []int) {
-	var slots [kddmj.TILEMAX]int
+	var slots [sxtdhmj.TILEMAX]int
 
 	var distinctCards []int
 	for _, c := range handCards {
@@ -713,8 +713,8 @@ func calcHandCardsKey(handCards []int) (int, []int) {
 	return num, distinctCards
 }
 
-// func getMaxOneCard(slots [kddmj.TILEMAX]int) (bool, int) {
-// 	for i := kddmj.TON; i <= kddmj.CHU; i++ {
+// func getMaxOneCard(slots [sxtdhmj.TILEMAX]int) (bool, int) {
+// 	for i := sxtdhmj.TON; i <= sxtdhmj.CHU; i++ {
 // 		if slots[i] == 1 {
 // 			return true, i
 // 		}
@@ -776,16 +776,16 @@ func calcHandCardsKey(handCards []int) (int, []int) {
 // func OneLaiZiAddPuZiToHandCards(t *testing.T, handCards []int, jiang int, level int) bool {
 // 	if level <= 0 {
 
-// 		slots := kddmj.GenSlots(handCards)
+// 		slots := sxtdhmj.GenSlots(handCards)
 // 		ret, maxOneCard := getMaxOneCard(slots)
 // 		if ret {
 // 			laizi := []int{}
 // 			laizi = append(laizi, maxOneCard)
-// 			ok, dianshu := kddmj.CanHuWithLaiZi(handCards, laizi)
-// 			if !ok || dianshu != kddmj.DianShuTable[maxOneCard] {
+// 			ok, dianshu := sxtdhmj.CanHuWithLaiZi(handCards, laizi)
+// 			if !ok || dianshu != sxtdhmj.DianShuTable[maxOneCard] {
 // 				fmt.Println("slots=", slots, ", maxOneCard=", maxOneCard,
-// 					"kddmj.DianShuTable[maxOneCard]=", kddmj.DianShuTable[maxOneCard], "dianshu=", dianshu, ", ")
-// 				kddmj.ShowHandCards(handCards)
+// 					"sxtdhmj.DianShuTable[maxOneCard]=", sxtdhmj.DianShuTable[maxOneCard], "dianshu=", dianshu, ", ")
+// 				sxtdhmj.ShowHandCards(handCards)
 // 				t.Error("CanHu failed.")
 // 				return false
 // 			}
@@ -802,7 +802,7 @@ func calcHandCardsKey(handCards []int) (int, []int) {
 // 		handCards1 = append(handCards1, one.PuZi[0])
 // 		handCards1 = append(handCards1, one.PuZi[1])
 // 		handCards1 = append(handCards1, one.PuZi[2])
-// 		if !kddmj.IsValidHandCards(handCards1) {
+// 		if !sxtdhmj.IsValidHandCards(handCards1) {
 // 			continue
 // 		}
 

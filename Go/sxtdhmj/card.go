@@ -1,4 +1,4 @@
-package kddmj
+package sxtdhmj
 
 /*
 常用中英文对照(http://www.xqbase.com/other/mahjongg_english.htm):
