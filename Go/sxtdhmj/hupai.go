@@ -4,304 +4,174 @@ import (
 	"fmt"
 )
 
-var (
-	// HeiSanFeng 是否开启黑三风
-	HeiSanFeng bool
-
-	// ZhongFaBai 是否开启中发白
-	ZhongFaBai bool
-
-	// ZhongFaWu 是否开启中发五: 五就是五万，五条，五筒可以代替白板。
-	ZhongFaWu bool
-)
-
 var tableMgr *TableMgr
 
 func init() {
 	tableMgr = NewTableMgr()
-	//tableMgr.Load("E:\\Go\\GOPATH\\src\\github.com\\MDGSF\\MJHuPai\\Go\\sxtdhmj\\genTable\\")
+	tableMgr.Load("E:\\Go\\GOPATH\\src\\github.com\\MDGSF\\MJHuPai\\Go\\sxtdhmj\\genTable\\")
 	//tableMgr.Load(".\\")
-
-	HeiSanFeng = false
-	ZhongFaBai = false
-	ZhongFaWu = false
 }
 
 /*
-CanHuWithLaiZi 赖子胡牌
+CanHu 胡牌
 handCards: 手牌数组，最多14张。
-laizi: 赖子数组，保存可能的赖子。
+HeiSanFeng: 是否开启黑三风
+ZhongFaBai: 是否开启中发白
+ZhongFaWu: 是否开启中发五: 五就是五万，五条，五筒可以代替白板。
 return: true可以胡牌，false不可以胡牌。
-return int: 点数。
 */
-func CanHuWithLaiZi(handCards []int, laizi []int) (bool, int) {
+func CanHu(handCards []int, HeiSanFeng bool, ZhongFaBai bool, ZhongFaWu bool) (bool, int) {
 
 	if !IsValidHandCards(handCards) {
 		return false, 0
 	}
 
-	var bHasCommonCard = false
+	TableXuShuWithEye := tableMgr.TableXuShuWithEye
+	TableXuShu := tableMgr.TableXuShu
+	TableFeng, TableFengWithEye := getFengTable(HeiSanFeng)
+	TableJian, TableJianWithEye := getJianTable(ZhongFaBai, ZhongFaWu)
 
-	laiziNum := 0
-	var slots [TILEMAX]int
-	for _, c := range handCards {
-		if isLaizi(c, laizi) {
-			laiziNum++
-		} else {
-			bHasCommonCard = true
-			slots[c]++
+	slots := GenSlots(handCards)
+	allPossibleSlotHandCards := genAllPossibleSlotHandCards(slots, ZhongFaWu)
+
+	bCanHu := false
+	maxHeiSanFengNum := 0 //黑三风数量
+	maxZhongFaBaiNum := 0 //中发白数量
+	maxFengNum := 0       //这个是黑三风和中发白的数量总和
+
+	for _, v := range allPossibleSlotHandCards {
+		XuShu, Feng, Jian := getArray(v.slots)
+
+		if len(XuShu) > 0 {
+			ret1, fengNum1, heiSanFengNum1, zhongFaBaiNum1 := walkThroughTable(XuShu, Feng, Jian, TableXuShuWithEye, TableXuShu, TableFeng, TableJian)
+			if ret1 && fengNum1 >= maxFengNum {
+				bCanHu = true
+				maxHeiSanFengNum = heiSanFengNum1
+				maxZhongFaBaiNum = zhongFaBaiNum1
+				maxFengNum = maxHeiSanFengNum + maxZhongFaBaiNum
+			}
 		}
+
+		if len(Feng) > 0 {
+			ret2, fengNum2, heiSanFengNum2, zhongFaBaiNum2 := walkThroughTable(Feng, XuShu, Jian, TableFengWithEye, TableFeng, TableXuShu, TableJian)
+			if ret2 && fengNum2 >= maxFengNum {
+				bCanHu = true
+				maxHeiSanFengNum = heiSanFengNum2
+				maxZhongFaBaiNum = zhongFaBaiNum2
+				maxFengNum = fengNum2
+			}
+		}
+
+		if len(Jian) > 0 {
+			ret3, fengNum3, heiSanFengNum3, zhongFaBaiNum3 := walkThroughTable(Jian, XuShu, Feng, TableJianWithEye, TableJian, TableXuShu, TableFeng)
+			if ret3 && fengNum3 >= maxFengNum {
+				bCanHu = true
+				maxHeiSanFengNum = heiSanFengNum3
+				maxZhongFaBaiNum = zhongFaBaiNum3
+				maxFengNum = fengNum3
+			}
+		}
+
+		// log.Println("ret1 = ", ret1, ", fengNum1 = ", fengNum1, ", heiSanFengNum1 = ", heiSanFengNum1, ", zhongFaBaiNum1 = ", zhongFaBaiNum1)
+		// log.Println("ret2 = ", ret2, ", fengNum2 = ", fengNum2, ", heiSanFengNum2 = ", heiSanFengNum2, ", zhongFaBaiNum2 = ", zhongFaBaiNum2)
+		// log.Println("ret3 = ", ret3, ", fengNum3 = ", fengNum3, ", heiSanFengNum3 = ", heiSanFengNum3, ", zhongFaBaiNum3 = ", zhongFaBaiNum3)
 	}
 
-	if !bHasCommonCard && laiziNum > 0 {
-		//手牌全部都是赖子。
-		return true, 10
-	}
+	// log.Println("bCanHu = ", bCanHu)
+	// log.Println("maxHeiSanFengNum = ", maxHeiSanFengNum)
+	// log.Println("maxZhongFaBaiNum = ", maxZhongFaBaiNum)
+	// log.Println("maxFengNum = ", maxFengNum)
 
-	XuShu, Zi := getArray(slots)
-
-	ret1, dianshu1 := walkThroughTable(laiziNum, XuShu, Zi, tableMgr.TableXuShuWithEye, tableMgr.TableXuShu, tableMgr.TableZi)
-
-	ret2, dianshu2 := walkThroughTable(laiziNum, Zi, XuShu, tableMgr.TableZiWithEye, tableMgr.TableZi, tableMgr.TableXuShu)
-
-	if ret1 && ret2 {
-		return true, max(dianshu1, dianshu2)
-	} else if !ret1 && ret2 {
-		return true, dianshu2
-	} else if ret1 && !ret2 {
-		return true, dianshu1
-	}
-
-	return false, 0
+	return bCanHu, maxFengNum
 }
 
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func getArray(slots [TILEMAX]int) (XuShu []int, Zi []int) {
-	if getWan(slots) > 0 {
-		XuShu = append(XuShu, getWan(slots))
-	}
-	if getTiao(slots) > 0 {
-		XuShu = append(XuShu, getTiao(slots))
-	}
-	if getTong(slots) > 0 {
-		XuShu = append(XuShu, getTong(slots))
-	}
-
-	if getFeng(slots) > 0 {
-		Zi = append(Zi, getFeng(slots))
-	}
-	if getJian(slots) > 0 {
-		Zi = append(Zi, getJian(slots))
-	}
-
-	return
-}
-
-func walkThroughTable(laiziNum int, jiangArray []int, commonArray []int,
-	jTableWithEye *Table, jTableNoEye *Table, cTableNoEye *Table) (bool, int) {
-
-	//保存最大的点数
-	var maxDianShu = 0
-
-	//保存当前这次计算时最大的点数
-	var curMaxDianShu = 0
-
-	var bCanHu = false
+func walkThroughTable(jiangArray []int,
+	commonArray1 []int, commonArray2 []int,
+	jTableWithEye *Table, jTableNoEye *Table,
+	cTableNoEye1 *Table, cTableNoEye2 *Table) (CanHu bool,
+	FengNum int, HeiSanFengNum int, ZhongFaBaiNum int) {
 
 	for i, iNum := range jiangArray {
-		success := true
-		hasLaiZiNum := laiziNum
-
-		//这里会把8个赖子全部遍历，但是没有必要，因为也许我一共也只有3个赖子。
-		dianShu, jiangNeedLaiZiNum, ok := jTableWithEye.IsInTable(iNum)
-		if !ok || jiangNeedLaiZiNum > hasLaiZiNum {
+		_, ok := jTableWithEye.IsInTableMap(iNum, 0)
+		if !ok {
 			continue
-		}
-		hasLaiZiNum -= jiangNeedLaiZiNum
-		if jiangNeedLaiZiNum > 0 {
-			curMaxDianShu = dianShu
 		}
 
 		for j, jNum := range jiangArray {
 			if i == j {
 				continue
 			}
-			dianShu, needLaiZiNum, ok := jTableNoEye.IsInTable(jNum)
-			if !ok || needLaiZiNum > hasLaiZiNum {
-				success = false
-				break
-			}
-			hasLaiZiNum -= needLaiZiNum
-			if needLaiZiNum > 0 && dianShu > curMaxDianShu {
-				curMaxDianShu = dianShu
-			}
-		}
-		if !success {
-			continue
-		}
 
-		for _, num := range commonArray {
-			dianShu, needLaiZiNum, ok := cTableNoEye.IsInTable(num)
-			if !ok || needLaiZiNum > hasLaiZiNum {
-				success = false
-				break
-			}
-			hasLaiZiNum -= needLaiZiNum
-			if needLaiZiNum > 0 && dianShu > curMaxDianShu {
-				curMaxDianShu = dianShu
-			}
-		}
-		if !success {
-			continue
-		}
-
-		if hasLaiZiNum >= 3 || curMaxDianShu == 10 {
-			return true, 10
-		}
-
-		if jiangNeedLaiZiNum == 2 {
-			_, ok := jTableNoEye.IsInTableMap(iNum, 0)
-			if ok {
-				return true, 10
-			}
-		} else if jiangNeedLaiZiNum == 3 {
-			_, ok := jTableNoEye.IsInTableMap(iNum, 1)
-			if ok {
-				return true, 10
-			}
-		} else if jiangNeedLaiZiNum == 4 {
-			_, ok := jTableNoEye.IsInTableMap(iNum, 2)
-			if ok {
-				return true, 10
+			_, ok := jTableNoEye.IsInTableMap(jNum, 0)
+			if !ok {
+				return false, 0, 0, 0
 			}
 		}
 
-		if curMaxDianShu > maxDianShu {
-			maxDianShu = curMaxDianShu
+		for _, num := range commonArray1 {
+			_, ok = cTableNoEye1.IsInTableMap(num, 0)
+			if !ok {
+				return false, 0, 0, 0
+			}
 		}
-		bCanHu = true
+
+		for _, zNum := range commonArray2 {
+			_, ok = cTableNoEye2.IsInTableMap(zNum, 0)
+			if !ok {
+				return false, 0, 0, 0
+			}
+		}
+
+		return true, 0, 0, 0
 	}
 
-	if bCanHu {
-		return true, maxDianShu
-	}
-	return false, 0
+	return false, 0, 0, 0
 }
 
-func isLaizi(c int, LaiZiArr []int) bool {
-	for _, laizi := range LaiZiArr {
-		if c == laizi {
-			return true
-		}
+func getFengTable(HeiSanFeng bool) (TableFeng, TableFengWithEye *Table) {
+	if HeiSanFeng {
+		TableFeng = tableMgr.TableFeng
+		TableFengWithEye = tableMgr.TableFengWithEye
+	} else {
+		TableFeng = tableMgr.TableFengKe
+		TableFengWithEye = tableMgr.TableFengKeWithEye
 	}
-	return false
+	return
 }
 
-/*
-CanHu 胡牌
-handCards: 手牌数组，最多14张。
-return: true可以胡牌，false不可以胡牌。
-*/
-func CanHu(handCards []int) bool {
+func getJianTable(ZhongFaBai bool, ZhongFaWu bool) (TableJian, TableJianWithEye *Table) {
+	if ZhongFaBai || ZhongFaWu {
+		TableJian = tableMgr.TableJian
+		TableJianWithEye = tableMgr.TableJianWithEye
+	} else {
+		TableJian = tableMgr.TableJianKe
+		TableJianWithEye = tableMgr.TableJianKeWithEye
+	}
+	return
+}
 
-	if !IsValidHandCards(handCards) {
-		return false
+func getArray(slots [TILEMAX]int) (XuShu []int, Feng []int, Jian []int) {
+	if getWan(slots) > 0 {
+		XuShu = append(XuShu, getWan(slots))
 	}
 
-	slots := GenSlots(handCards)
-
-	// fmt.Println("getWan = ", getWan(slots))
-	// fmt.Println("getTiao = ", getTiao(slots))
-	// fmt.Println("getTong = ", getTong(slots))
-	// fmt.Println("getFeng = ", getFeng(slots))
-	// fmt.Println("getJian = ", getJian(slots))
-
-	wan := getWan(slots)
-	tiao := getTiao(slots)
-	tong := getTong(slots)
-	feng := getFeng(slots)
-	jian := getJian(slots)
-
-	var XuShu []int
-	if wan > 0 {
-		XuShu = append(XuShu, wan)
-	}
-	if tiao > 0 {
-		XuShu = append(XuShu, tiao)
-	}
-	if tong > 0 {
-		XuShu = append(XuShu, tong)
+	if getTiao(slots) > 0 {
+		XuShu = append(XuShu, getTiao(slots))
 	}
 
-	var Zi []int
-	if feng > 0 {
-		Zi = append(Zi, feng)
-	}
-	if jian > 0 {
-		Zi = append(Zi, jian)
+	if getTong(slots) > 0 {
+		XuShu = append(XuShu, getTong(slots))
 	}
 
-	for i, iNum := range XuShu {
-		_, ok := tableMgr.TableXuShuWithEye.IsInTableMap(iNum, 0)
-		if !ok {
-			continue
-		}
-
-		for j, jNum := range XuShu {
-			if i == j {
-				continue
-			}
-
-			_, ok := tableMgr.TableXuShu.IsInTableMap(jNum, 0)
-			if !ok {
-				return false
-			}
-		}
-
-		for _, num := range Zi {
-			_, ok := tableMgr.TableZi.IsInTableMap(num, 0)
-			if !ok {
-				return false
-			}
-		}
-
-		return true
+	if getFeng(slots) > 0 {
+		Feng = append(Feng, getFeng(slots))
 	}
 
-	for i, iNum := range Zi {
-		_, ok := tableMgr.TableZiWithEye.IsInTableMap(iNum, 0)
-		if !ok {
-			continue
-		}
-
-		for j, jNum := range Zi {
-			if i == j {
-				continue
-			}
-
-			_, ok := tableMgr.TableZi.IsInTableMap(jNum, 0)
-			if !ok {
-				return false
-			}
-		}
-
-		for _, num := range XuShu {
-			_, ok := tableMgr.TableXuShu.IsInTableMap(num, 0)
-			if !ok {
-				return false
-			}
-		}
-
-		return true
+	if getJian(slots) > 0 {
+		Jian = append(Jian, getJian(slots))
 	}
 
-	return false
+	return
 }
 
 /*
@@ -353,6 +223,53 @@ func GenSlots(handCards []int) [TILEMAX]int {
 	return slots
 }
 
+type slotHandCards struct {
+	slots [TILEMAX]int
+}
+
+func genAllPossibleSlotHandCards(slots [TILEMAX]int, ZhongFaWu bool) (allPossibleSlotHandCards []slotHandCards) {
+	var a slotHandCards
+	for i := 0; i < TILEMAX; i++ {
+		a.slots[i] = slots[i]
+	}
+	allPossibleSlotHandCards = append(allPossibleSlotHandCards, a)
+
+	if !ZhongFaWu {
+		return
+	}
+
+	man5Num := slots[MAN5]
+	pin5Num := slots[PIN5]
+	sou5Num := slots[SOU5]
+	hakNum := slots[HAK]
+
+	for i := 0; i <= man5Num; i++ {
+		for j := 0; j <= pin5Num; j++ {
+			for k := 0; k <= sou5Num; k++ {
+				curMan5Num := i
+				curPin5Num := j
+				curSou5Num := k
+				curHakNum := hakNum + (man5Num - i) + (pin5Num - j) + (sou5Num - k)
+				if curHakNum > 4 {
+					continue
+				}
+
+				var a slotHandCards
+				for i := 0; i < TILEMAX; i++ {
+					a.slots[i] = slots[i]
+				}
+				a.slots[MAN5] = curMan5Num
+				a.slots[PIN5] = curPin5Num
+				a.slots[SOU5] = curSou5Num
+				a.slots[HAK] = curHakNum
+				allPossibleSlotHandCards = append(allPossibleSlotHandCards, a)
+			}
+		}
+	}
+
+	return
+}
+
 func getWan(slots [TILEMAX]int) int {
 	return getNum(slots, CharacterOne, CharacterNine)
 }
@@ -390,6 +307,13 @@ func ShowHandCards(handCards []int) {
 		fmt.Printf("%d, ", c)
 	}
 	fmt.Println()
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
 
 /*
@@ -448,50 +372,3 @@ func ShowHandCards(handCards []int) {
 
 表生成耗时：2-3S
 */
-var (
-	DianShuTable = make(map[int]int)
-)
-
-func init() {
-	initDianShuTable()
-}
-
-func initDianShuTable() {
-	DianShuTable[0] = 1
-	DianShuTable[1] = 2
-	DianShuTable[2] = 3
-	DianShuTable[3] = 4
-	DianShuTable[4] = 5
-	DianShuTable[5] = 6
-	DianShuTable[6] = 7
-	DianShuTable[7] = 8
-	DianShuTable[8] = 9
-
-	DianShuTable[9] = 1
-	DianShuTable[10] = 2
-	DianShuTable[11] = 3
-	DianShuTable[12] = 4
-	DianShuTable[13] = 5
-	DianShuTable[14] = 6
-	DianShuTable[15] = 7
-	DianShuTable[16] = 8
-	DianShuTable[17] = 9
-
-	DianShuTable[18] = 1
-	DianShuTable[19] = 2
-	DianShuTable[20] = 3
-	DianShuTable[21] = 4
-	DianShuTable[22] = 5
-	DianShuTable[23] = 6
-	DianShuTable[24] = 7
-	DianShuTable[25] = 8
-	DianShuTable[26] = 9
-
-	DianShuTable[27] = 10
-	DianShuTable[28] = 10
-	DianShuTable[29] = 10
-	DianShuTable[30] = 10
-	DianShuTable[31] = 10
-	DianShuTable[32] = 10
-	DianShuTable[33] = 10
-}

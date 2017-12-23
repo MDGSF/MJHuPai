@@ -439,7 +439,7 @@ func checkAndAdd(cards []int, iLaiZiNum int) bool {
 		return false //这里说明这个情况处理过了，去重。
 	}
 
-	(*HandCardsMapTemp)[key] = 1
+	(*HandCardsMapTemp)[key] = 0
 
 	for i := 0; i < curCardsTypeNum; i++ {
 		if cards[i] > 4 {
@@ -448,7 +448,7 @@ func checkAndAdd(cards []int, iLaiZiNum int) bool {
 	}
 
 	HandCardsMap := curTable[iLaiZiNum]
-	(*HandCardsMap)[key] = 1
+	(*HandCardsMap)[key] = 0
 	return true
 }
 
