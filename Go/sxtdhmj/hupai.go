@@ -4,12 +4,27 @@ import (
 	"fmt"
 )
 
+var (
+	// HeiSanFeng 是否开启黑三风
+	HeiSanFeng bool
+
+	// ZhongFaBai 是否开启中发白
+	ZhongFaBai bool
+
+	// ZhongFaWu 是否开启中发五: 五就是五万，五条，五筒可以代替白板。
+	ZhongFaWu bool
+)
+
 var tableMgr *TableMgr
 
 func init() {
 	tableMgr = NewTableMgr()
 	//tableMgr.Load("E:\\Go\\GOPATH\\src\\github.com\\MDGSF\\MJHuPai\\Go\\sxtdhmj\\genTable\\")
 	//tableMgr.Load(".\\")
+
+	HeiSanFeng = false
+	ZhongFaBai = false
+	ZhongFaWu = false
 }
 
 /*

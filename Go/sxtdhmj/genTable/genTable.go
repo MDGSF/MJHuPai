@@ -6,36 +6,105 @@ import (
 	"github.com/MDGSF/MJHuPai/Go/sxtdhmj"
 )
 
-const laiZiNum = 9
+const LaiZiNum = 9
 
 //只保存最终正确的结果。
 var tableMgr *sxtdhmj.TableMgr
 
 //除了保存最终正确的结果，还要把中间计算过的错误结果也保存起来，防止重复计算。
-var tableXuShuTemp [laiZiNum]*map[int]int
-var tableXuShuWithEyeTemp = [laiZiNum]*map[int]int{}
-var tableZiTemp = [laiZiNum]*map[int]int{}
-var tableZiWithEyeTemp = [laiZiNum]*map[int]int{}
+var tableXuShuTemp [LaiZiNum]*map[int]int
+var tableXuShuWithEyeTemp = [LaiZiNum]*map[int]int{}
 
-var curTable *[laiZiNum]*map[int]int
-var curTableTemp *[laiZiNum]*map[int]int
+//风牌
+var tableFengKeTemp = [LaiZiNum]*map[int]int{}
+var tableFengKeWithEyeTemp = [LaiZiNum]*map[int]int{}
+var tableFengTemp = [LaiZiNum]*map[int]int{}
+var tableFengWithEyeTemp = [LaiZiNum]*map[int]int{}
+
+//箭牌
+var tableJianKeTemp = [LaiZiNum]*map[int]int{}
+var tableJianKeWithEyeTemp = [LaiZiNum]*map[int]int{}
+var tableJianTemp = [LaiZiNum]*map[int]int{}
+var tableJianWithEyeTemp = [LaiZiNum]*map[int]int{}
+
+var tableZiTemp = [LaiZiNum]*map[int]int{}
+var tableZiWithEyeTemp = [LaiZiNum]*map[int]int{}
+
+var curTable *[LaiZiNum]*map[int]int
+var curTableTemp *[LaiZiNum]*map[int]int
 var curCardsTypeNum int
+
+type PuZi struct {
+	PuZi [3]int
+}
+
+var heiSanFeng []*PuZi
+
+func genHeiSanFengAllPossible() {
+	hsfPuZi1 := &PuZi{}
+	hsfPuZi1.PuZi[0] = sxtdhmj.TON
+	hsfPuZi1.PuZi[1] = sxtdhmj.NAN
+	hsfPuZi1.PuZi[2] = sxtdhmj.SHA
+	heiSanFeng = append(heiSanFeng, hsfPuZi1)
+
+	hsfPuZi2 := &PuZi{}
+	hsfPuZi2.PuZi[0] = sxtdhmj.TON
+	hsfPuZi2.PuZi[1] = sxtdhmj.NAN
+	hsfPuZi2.PuZi[2] = sxtdhmj.PEI
+	heiSanFeng = append(heiSanFeng, hsfPuZi2)
+
+	hsfPuZi3 := &PuZi{}
+	hsfPuZi3.PuZi[0] = sxtdhmj.TON
+	hsfPuZi3.PuZi[1] = sxtdhmj.SHA
+	hsfPuZi3.PuZi[2] = sxtdhmj.PEI
+	heiSanFeng = append(heiSanFeng, hsfPuZi3)
+
+	hsfPuZi4 := &PuZi{}
+	hsfPuZi4.PuZi[0] = sxtdhmj.SHA
+	hsfPuZi4.PuZi[1] = sxtdhmj.NAN
+	hsfPuZi4.PuZi[2] = sxtdhmj.PEI
+	heiSanFeng = append(heiSanFeng, hsfPuZi4)
+}
 
 func main() {
 
 	fmt.Println("main start")
 
+	genHeiSanFengAllPossible()
+
 	tableMgr = sxtdhmj.NewTableMgr()
 
-	for i := 0; i < laiZiNum; i++ {
+	for i := 0; i < LaiZiNum; i++ {
 		tableXuShuTemp[i] = &map[int]int{}
 		tableXuShuWithEyeTemp[i] = &map[int]int{}
+
+		tableFengKeTemp[i] = &map[int]int{}
+		tableFengKeWithEyeTemp[i] = &map[int]int{}
+		tableFengTemp[i] = &map[int]int{}
+		tableFengWithEyeTemp[i] = &map[int]int{}
+
+		tableJianKeTemp[i] = &map[int]int{}
+		tableJianKeWithEyeTemp[i] = &map[int]int{}
+		tableJianTemp[i] = &map[int]int{}
+		tableJianWithEyeTemp[i] = &map[int]int{}
+
 		tableZiTemp[i] = &map[int]int{}
 		tableZiWithEyeTemp[i] = &map[int]int{}
 	}
 
 	genTableXuShu()
 	genTableXuShuWithEye()
+
+	genTableFengKe()
+	genTableFengKeWithEye()
+	genTableFeng()
+	genTableFengWithEye()
+
+	genTableJianKe()
+	genTableJianKeWithEye()
+	genTableJian()
+	genTableJianWithEye()
+
 	genTableZi()
 	genTableZiWithEye()
 
@@ -64,13 +133,168 @@ func genTableXuShuWithEye() {
 	cards := []int{0, 0, 0, 0, 0, 0, 0, 0, 0}
 	for i := 0; i <= 8; i++ {
 		cards[i] = 2
-		fmt.Println("genTableXuShuWithEye jiang = ", i)
+		//fmt.Println("genTableXuShuWithEye jiang = ", i)
 		addToXuShu(cards)
 		genXuShuPuZi(cards, 1)
 		cards[i] = 0
 	}
 
 	fmt.Println("genTableXuShuWithEye success")
+}
+
+func genTableFengKe() {
+	fmt.Println("genTableFengKe start")
+
+	curTable = &tableMgr.TableFengKe.Map
+	curTableTemp = &tableFengKeTemp
+	curCardsTypeNum = 4
+	cards := []int{0, 0, 0, 0}
+	genZiPuZi(cards, 1)
+
+	fmt.Println("genTableFengKe success")
+}
+
+func genTableFengKeWithEye() {
+	fmt.Println("genTableFengKeWithEye start")
+
+	curTable = &tableMgr.TableFengKeWithEye.Map
+	curTableTemp = &tableFengKeWithEyeTemp
+	curCardsTypeNum = 4
+
+	cards := []int{0, 0, 0, 0}
+	for i := 0; i < curCardsTypeNum; i++ {
+		cards[i] = 2
+		//fmt.Println("genTableZiWithEye jiang = ", i)
+		addToXuShu(cards)
+		genZiPuZi(cards, 1)
+		cards[i] = 0
+	}
+
+	fmt.Println("genTableFengKeWithEye success")
+}
+
+func genTableFeng() {
+	fmt.Println("genTableFeng start")
+
+	curTable = &tableMgr.TableFeng.Map
+	curTableTemp = &tableFengTemp
+	curCardsTypeNum = 4
+	cards := []int{0, 0, 0, 0}
+	genHeiSanFengPuZi(cards, 1, 0)
+
+	fmt.Println("genTableFeng success")
+}
+
+func genTableFengWithEye() {
+	fmt.Println("genTableFengWithEye start")
+
+	curTable = &tableMgr.TableFengWithEye.Map
+	curTableTemp = &tableFengWithEyeTemp
+	curCardsTypeNum = 4
+
+	cards := []int{0, 0, 0, 0}
+	for i := 0; i < curCardsTypeNum; i++ {
+		cards[i] = 2
+		//fmt.Println("genTableZiWithEye jiang = ", i)
+		checkAndAddHeiSanFeng(cards, 0, 0)
+		genHeiSanFengPuZi(cards, 1, 0)
+		cards[i] = 0
+	}
+
+	fmt.Println("genTableFengWithEye success")
+}
+
+func genTableJianKe() {
+	fmt.Println("genTableJianKe start")
+
+	curTable = &tableMgr.TableJianKe.Map
+	curTableTemp = &tableJianKeTemp
+	curCardsTypeNum = 3
+	cards := []int{0, 0, 0}
+	genZiPuZi(cards, 1)
+
+	fmt.Println("genTableJianKe success")
+}
+
+func genTableJianKeWithEye() {
+	fmt.Println("genTableJianKeWithEye start")
+
+	curTable = &tableMgr.TableJianKeWithEye.Map
+	curTableTemp = &tableJianKeWithEyeTemp
+	curCardsTypeNum = 3
+
+	cards := []int{0, 0, 0}
+	for i := 0; i < curCardsTypeNum; i++ {
+		cards[i] = 2
+		//fmt.Println("genTableZiWithEye jiang = ", i)
+		addToXuShu(cards)
+		genZiPuZi(cards, 1)
+		cards[i] = 0
+	}
+
+	fmt.Println("genTableJianKeWithEye success")
+}
+
+func genTableJian() {
+	fmt.Println("genTableJian start")
+
+	curTable = &tableMgr.TableJian.Map
+	curTableTemp = &tableJianTemp
+	curCardsTypeNum = 3
+	cards := []int{0, 0, 0}
+	genZhongFaBaiPuZi(cards, 1, 0)
+
+	fmt.Println("genTableJian success")
+}
+
+func genTableJianWithEye() {
+	fmt.Println("genTableJianWithEye start")
+
+	curTable = &tableMgr.TableJianWithEye.Map
+	curTableTemp = &tableJianWithEyeTemp
+	curCardsTypeNum = 4
+
+	cards := []int{0, 0, 0, 0}
+	for i := 0; i < curCardsTypeNum; i++ {
+		cards[i] = 2
+		//fmt.Println("genTableZiWithEye jiang = ", i)
+		checkAndAddHeiSanFeng(cards, 0, 0)
+		genZhongFaBaiPuZi(cards, 1, 0)
+		cards[i] = 0
+	}
+
+	fmt.Println("genTableJianWithEye success")
+}
+
+func genTableZi() {
+	fmt.Println("genTableZi start")
+
+	curTable = &tableMgr.TableZi.Map
+	curTableTemp = &tableZiTemp
+	curCardsTypeNum = 7
+	cards := []int{0, 0, 0, 0, 0, 0, 0}
+	genZiPuZi(cards, 1)
+
+	fmt.Println("genTableZi success")
+}
+
+func genTableZiWithEye() {
+	fmt.Println("genTableZiWithEye start")
+
+	curTable = &tableMgr.TableZiWithEye.Map
+	curTableTemp = &tableZiWithEyeTemp
+	curCardsTypeNum = 7
+
+	cards := []int{0, 0, 0, 0, 0, 0, 0}
+	for i := 0; i < curCardsTypeNum; i++ {
+		cards[i] = 2
+		//fmt.Println("genTableZiWithEye jiang = ", i)
+		addToXuShu(cards)
+		genZiPuZi(cards, 1)
+		cards[i] = 0
+	}
+
+	fmt.Println("genTableZiWithEye success")
 }
 
 func genXuShuPuZi(cards []int, level int) {
@@ -101,156 +325,58 @@ func genXuShuPuZi(cards []int, level int) {
 	}
 }
 
-func addToXuShu(cards []int) {
-	ret, _ := checkAndAdd(cards, 0, 0, 0)
-	if !ret {
-		return
-	}
-
-	addToXuShuSub(cards, 1, 0)
-}
-
-func addToXuShuSub(cards []int, iLaiZiNum int, parentDianShu int) {
-	if iLaiZiNum >= laiZiNum {
+func genHeiSanFengPuZi(cards []int, level int, heiSanFengNum int) {
+	if level > 4 {
 		return
 	}
 
 	for i := 0; i < curCardsTypeNum; i++ {
-		if cards[i] == 0 {
+		if cards[i] > 3 {
 			continue
 		}
 
-		cards[i]--
-		ret, dianshu := checkAndAdd(cards, iLaiZiNum, i, parentDianShu)
-		if !ret {
-			cards[i]++
+		cards[i] += 3
+		checkAndAddHeiSanFeng(cards, 0, heiSanFengNum)
+		genHeiSanFengPuZi(cards, level+1, heiSanFengNum)
+		cards[i] -= 3
+	}
+
+	for _, v := range heiSanFeng {
+		cards[v.PuZi[0]-sxtdhmj.TON]++
+		cards[v.PuZi[1]-sxtdhmj.TON]++
+		cards[v.PuZi[2]-sxtdhmj.TON]++
+		checkAndAddHeiSanFeng(cards, 0, heiSanFengNum+1)
+		genHeiSanFengPuZi(cards, level+1, heiSanFengNum+1)
+		cards[v.PuZi[0]-sxtdhmj.TON]--
+		cards[v.PuZi[1]-sxtdhmj.TON]--
+		cards[v.PuZi[2]-sxtdhmj.TON]--
+	}
+}
+
+func genZhongFaBaiPuZi(cards []int, level int, zhongFaBaiNum int) {
+	if level > 4 {
+		return
+	}
+
+	for i := 0; i < curCardsTypeNum; i++ {
+		if cards[i] > 3 {
 			continue
 		}
 
-		addToXuShuSub(cards, iLaiZiNum+1, dianshu)
-		cards[i]++
-	}
-}
-
-/*
-@brief checkAndAdd:
-@param cards:
-@param iLaiZiNum: 赖子的数量。
-@param laiZiStandFor: 当前这张赖子代替什么牌。当iLaiZiNum==0时，也就是没有赖子的时候，这个值没有用，填零就好了。
-@param parentDianShu: 上一级的点数。
-@return bool: true添加成功, false已经添加过了。
-@return int: 成功时返回点数，失败时返回0。
-*/
-func checkAndAdd(cards []int, iLaiZiNum int, laiZiStandFor int, parentDianShu int) (bool, int) {
-	if curCardsTypeNum == 9 {
-		return checkAndAddXuShu(cards, iLaiZiNum, laiZiStandFor, parentDianShu)
-	} else if curCardsTypeNum == 7 {
-		return checkAndAddZi(cards, iLaiZiNum, laiZiStandFor, parentDianShu)
-	}
-	return false, 0
-}
-
-func checkAndAddXuShu(cards []int, iLaiZiNum int, laiZiStandFor int, parentDianShu int) (bool, int) {
-	key := 0
-	for i := 0; i < curCardsTypeNum; i++ {
-		key = key*10 + cards[i]
+		cards[i] += 3
+		checkAndAddHeiSanFeng(cards, 0, zhongFaBaiNum)
+		genZhongFaBaiPuZi(cards, level+1, zhongFaBaiNum)
+		cards[i] -= 3
 	}
 
-	newDianShu := max(laiZiStandFor+1, parentDianShu)
-
-	HandCardsMapTemp := curTableTemp[iLaiZiNum]
-	oldDianShu, exists := (*HandCardsMapTemp)[key]
-	if exists && newDianShu <= oldDianShu {
-		return false, 0 //这里说明这个情况处理过了，并且新的点数没有比旧的更大，去重。
-	}
-
-	if iLaiZiNum == 0 {
-		(*HandCardsMapTemp)[key] = 0
-	} else if iLaiZiNum == 1 {
-		(*HandCardsMapTemp)[key] = laiZiStandFor + 1
-	} else {
-		(*HandCardsMapTemp)[key] = newDianShu
-	}
-
-	for i := 0; i < curCardsTypeNum; i++ {
-		if cards[i] > 4 {
-			return true, 0 //这里用true是说这种情况不行，但是如果有赖子的话，还是可能可以的。
-		}
-	}
-
-	HandCardsMap := curTable[iLaiZiNum]
-	if iLaiZiNum == 0 {
-		(*HandCardsMap)[key] = 0
-	} else if iLaiZiNum == 1 {
-		(*HandCardsMap)[key] = laiZiStandFor + 1
-	} else {
-		(*HandCardsMap)[key] = newDianShu
-	}
-	return true, (*HandCardsMap)[key]
-}
-
-func checkAndAddZi(cards []int, iLaiZiNum int, laiZiStandFor int, parentDianShu int) (bool, int) {
-	key := 0
-	for i := 0; i < curCardsTypeNum; i++ {
-		key = key*10 + cards[i]
-	}
-
-	HandCardsMapTemp := curTableTemp[iLaiZiNum]
-	_, exists := (*HandCardsMapTemp)[key]
-	if exists {
-		return false, 0 //这里说明这个情况处理过了，并且新的点数没有比旧的更大，去重。
-	}
-
-	if iLaiZiNum == 0 {
-		(*HandCardsMapTemp)[key] = 0
-	} else {
-		(*HandCardsMapTemp)[key] = 10
-	}
-
-	for i := 0; i < curCardsTypeNum; i++ {
-		if cards[i] > 4 {
-			return true, 0 //这里用true是说这种情况不行，但是如果有赖子的话，还是可能可以的。
-		}
-	}
-
-	HandCardsMap := curTable[iLaiZiNum]
-	if iLaiZiNum == 0 {
-		(*HandCardsMap)[key] = 0
-	} else {
-		(*HandCardsMap)[key] = 10
-	}
-	return true, (*HandCardsMap)[key]
-}
-
-func genTableZi() {
-	fmt.Println("genTableZi start")
-
-	curTable = &tableMgr.TableZi.Map
-	curTableTemp = &tableZiTemp
-	curCardsTypeNum = 7
-	cards := []int{0, 0, 0, 0, 0, 0, 0}
-	genZiPuZi(cards, 1)
-
-	fmt.Println("genTableZi success")
-}
-
-func genTableZiWithEye() {
-	fmt.Println("genTableZiWithEye start")
-
-	curTable = &tableMgr.TableZiWithEye.Map
-	curTableTemp = &tableZiWithEyeTemp
-	curCardsTypeNum = 7
-
-	cards := []int{0, 0, 0, 0, 0, 0, 0}
-	for i := 0; i < curCardsTypeNum; i++ {
-		cards[i] = 2
-		fmt.Println("genTableZiWithEye jiang = ", i)
-		addToXuShu(cards)
-		genZiPuZi(cards, 1)
-		cards[i] = 0
-	}
-
-	fmt.Println("genTableZiWithEye success")
+	cards[0]++
+	cards[1]++
+	cards[2]++
+	checkAndAddHeiSanFeng(cards, 0, zhongFaBaiNum+1)
+	genZhongFaBaiPuZi(cards, level+1, zhongFaBaiNum+1)
+	cards[0]--
+	cards[1]--
+	cards[2]--
 }
 
 func genZiPuZi(cards []int, level int) {
@@ -270,9 +396,84 @@ func genZiPuZi(cards []int, level int) {
 	}
 }
 
-func max(x, y int) int {
-	if x > y {
-		return x
+func addToXuShu(cards []int) {
+	if !checkAndAdd(cards, 0) {
+		return
 	}
-	return y
+
+	//没有赖子，暂时不需要这些，先注释掉
+	//addToXuShuSub(cards, 1)
+}
+
+func addToXuShuSub(cards []int, iLaiZiNum int) {
+	if iLaiZiNum >= LaiZiNum {
+		return
+	}
+
+	for i := 0; i < curCardsTypeNum; i++ {
+		if cards[i] == 0 {
+			continue
+		}
+
+		cards[i]--
+		if !checkAndAdd(cards, iLaiZiNum) {
+			cards[i]++
+			continue
+		}
+
+		addToXuShuSub(cards, iLaiZiNum+1)
+		cards[i]++
+	}
+}
+
+func checkAndAdd(cards []int, iLaiZiNum int) bool {
+
+	key := 0
+	for i := 0; i < curCardsTypeNum; i++ {
+		key = key*10 + cards[i]
+	}
+
+	HandCardsMapTemp := curTableTemp[iLaiZiNum]
+	_, exists := (*HandCardsMapTemp)[key]
+	if exists {
+		return false //这里说明这个情况处理过了，去重。
+	}
+
+	(*HandCardsMapTemp)[key] = 1
+
+	for i := 0; i < curCardsTypeNum; i++ {
+		if cards[i] > 4 {
+			return true //这里用true是说这种情况不行，但是如果有赖子的话，还是可能可以的。
+		}
+	}
+
+	HandCardsMap := curTable[iLaiZiNum]
+	(*HandCardsMap)[key] = 1
+	return true
+}
+
+func checkAndAddHeiSanFeng(cards []int, iLaiZiNum int, heiSanFengNum int) bool {
+
+	key := 0
+	for i := 0; i < curCardsTypeNum; i++ {
+		key = key*10 + cards[i]
+	}
+
+	HandCardsMapTemp := curTableTemp[iLaiZiNum]
+	v, exists := (*HandCardsMapTemp)[key]
+	if exists && heiSanFengNum <= v {
+		return false //这里说明这个情况处理过了，去重。
+	}
+
+	(*HandCardsMapTemp)[key] = heiSanFengNum
+
+	for i := 0; i < curCardsTypeNum; i++ {
+		if cards[i] > 4 {
+			return true //这里用true是说这种情况不行，但是如果有赖子的话，还是可能可以的。
+		}
+	}
+
+	HandCardsMap := curTable[iLaiZiNum]
+	(*HandCardsMap)[key] = heiSanFengNum
+	return true
 }
