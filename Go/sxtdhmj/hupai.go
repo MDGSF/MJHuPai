@@ -8,19 +8,24 @@ var tableMgr *TableMgr
 
 func init() {
 	tableMgr = NewTableMgr()
-	//tableMgr.Load("E:\\Go\\GOPATH\\src\\github.com\\MDGSF\\MJHuPai\\Go\\sxtdhmj\\genTable\\")
+	tableMgr.Load("E:\\Go\\GOPATH\\src\\github.com\\MDGSF\\MJHuPai\\Go\\sxtdhmj\\genTable\\")
 	//tableMgr.Load(".\\")
 }
 
 /*
 CanHu 胡牌
 handCards: 手牌数组，最多14张。
+huType: 胡牌类型，1自摸，2点炮。
+huCard: 胡的那张牌，自摸的那张 或者是 点炮的那张。
 HeiSanFeng: 是否开启黑三风
 ZhongFaBai: 是否开启中发白
 ZhongFaWu: 是否开启中发五: 五就是五万，五条，五筒可以代替白板。
-return: true可以胡牌，false不可以胡牌。
+return:
+true可以胡牌，最大黑三风和中发白的数量。
+false不可以胡牌，0。
 */
-func CanHu(handCards []int, HeiSanFeng bool, ZhongFaBai bool, ZhongFaWu bool) (bool, int) {
+func CanHu(handCards []int, huType int, huCard int,
+	HeiSanFeng bool, ZhongFaBai bool, ZhongFaWu bool) (bool, int) {
 
 	if !IsValidHandCards(handCards) {
 		return false, 0
@@ -43,7 +48,8 @@ func CanHu(handCards []int, HeiSanFeng bool, ZhongFaBai bool, ZhongFaWu bool) (b
 		XuShu, Feng, Jian := getArray(v.slots)
 
 		if len(XuShu) > 0 {
-			ret1, fengNum1, heiSanFengNum1, zhongFaBaiNum1 := walkThroughTable(XuShu, Feng, Jian, TableXuShuWithEye, TableXuShu, TableFeng, TableJian)
+			ret1, fengNum1, heiSanFengNum1, zhongFaBaiNum1 := walkThroughTableXuShuJiang(XuShu, Feng, Jian,
+				TableXuShuWithEye, TableXuShu, TableFeng, TableJian, huType, huCard)
 			if ret1 && fengNum1 >= maxFengNum {
 				bCanHu = true
 				maxHeiSanFengNum = heiSanFengNum1
@@ -83,6 +89,72 @@ func CanHu(handCards []int, HeiSanFeng bool, ZhongFaBai bool, ZhongFaWu bool) (b
 	// log.Println("maxFengNum = ", maxFengNum)
 
 	return bCanHu, maxFengNum
+}
+
+func walkThroughTableXuShuJiang(XuShu []int,
+	Feng []int, Jian []int,
+	TableXuShuWithEye *Table, TableXuShu *Table,
+	TableFeng *Table, TableJian *Table,
+	huType int, huCard int) (CanHu bool,
+	FengNum int, HeiSanFengNum int, ZhongFaBaiNum int) {
+
+	bFound := false
+
+	maxFengNum := 0
+	maxHeiSanFengNum := 0
+	maxZhongFaBaiNum := 0
+
+	for i, iNum := range XuShu {
+
+		bInTable := false
+		curFengNum := 0
+		curHeiSanFengNum := 0
+		curZhongFaBaiNum := 0
+
+		_, ok := TableXuShuWithEye.IsInTableMap(iNum, 0)
+		if !ok {
+			continue
+		}
+
+		for j, jNum := range XuShu {
+			if i == j {
+				continue
+			}
+
+			_, ok := TableXuShu.IsInTableMap(jNum, 0)
+			if !ok {
+				return false, 0, 0, 0
+			}
+		}
+
+		for _, num := range Feng {
+			bInTable, curHeiSanFengNum = TableFeng.IsValid(num, huType, huCard)
+			if !bInTable {
+				return false, 0, 0, 0
+			}
+		}
+
+		for _, zNum := range Jian {
+			bInTable, curZhongFaBaiNum = TableJian.IsValid(zNum, huType, huCard)
+			if !bInTable {
+				return false, 0, 0, 0
+			}
+		}
+
+		curFengNum = curHeiSanFengNum + curZhongFaBaiNum
+		if curFengNum > maxFengNum {
+			maxFengNum = curFengNum
+			maxHeiSanFengNum = curHeiSanFengNum
+			maxZhongFaBaiNum = curZhongFaBaiNum
+		}
+
+		bFound = true
+	}
+
+	if bFound {
+		return true, maxFengNum, maxHeiSanFengNum, maxZhongFaBaiNum
+	}
+	return false, 0, 0, 0
 }
 
 func walkThroughTable(jiangArray []int,

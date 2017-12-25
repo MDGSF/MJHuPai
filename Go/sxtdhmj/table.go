@@ -77,6 +77,38 @@ func (table *Table) IsInTableMap(num int, iLaiZiNum int) (*TdhValue, bool) {
 	return value, ok
 }
 
+/*
+IsValid 判断是不是可以胡牌
+num:
+huType: 胡牌类型，1自摸，2点炮。
+huCard: 胡的那张牌，自摸的那张 或者是 点炮的那张。
+*/
+func (table *Table) IsValid(num int, huType int, huCard int) (bInTable bool, maxFengNum int) {
+
+	//因为推倒胡没有赖子，所以这里直接就查第一张表就好了。
+	value, ok := (*table.Map[0])[num]
+	if !ok {
+		return false, 0
+	}
+
+	//不是黑三风和中发白
+	if len(value.HuZiMo) == 0 && len(value.HuDianPao) == 0 {
+		return true, 0
+	}
+
+	if huType == 1 {
+		if v, ok := value.HuZiMo[huCard]; ok {
+			return true, v
+		}
+	} else if huType == 2 {
+		if v, ok := value.HuDianPao[huCard]; ok {
+			return true, v
+		}
+	}
+
+	return false, 0
+}
+
 //Load 加载表到内存中
 func (table *Table) Load(prefix string) {
 	for i := 0; i < LaiZiNum; i++ {
@@ -108,7 +140,7 @@ func loadFromFile(name string, table *map[int]*TdhValue) {
 		key, _ := strconv.Atoi(result[0])
 		sValue := strings.Split(result[1], "|")
 
-		tdh := &TdhValue{}
+		tdh := NewTdhValue()
 		tdh.FengNum, _ = strconv.Atoi(sValue[0])
 
 		ziMoValue := sValue[1]
@@ -117,21 +149,25 @@ func loadFromFile(name string, table *map[int]*TdhValue) {
 
 		if len(ziMoValue) > 0 {
 			sub := strings.Split(ziMoValue, ",")
-			for i := 0; i <= len(sub)/2; i += 2 {
-				node := &HuNode{}
-				node.Card, _ = strconv.Atoi(sub[i])
-				node.FengNum, _ = strconv.Atoi(sub[i+1])
-				tdh.HuZiMo[node.Card] = node.FengNum
+			if len(sub) > 0 {
+				for i := 0; i < len(sub); i += 2 {
+					node := &HuNode{}
+					node.Card, _ = strconv.Atoi(sub[i])
+					node.FengNum, _ = strconv.Atoi(sub[i+1])
+					tdh.HuZiMo[node.Card] = node.FengNum
+				}
 			}
 		}
 
 		if len(dianPaoValue) > 0 {
 			sub := strings.Split(dianPaoValue, ",")
-			for i := 0; i <= len(sub)/2; i += 2 {
-				node := &HuNode{}
-				node.Card, _ = strconv.Atoi(sub[i])
-				node.FengNum, _ = strconv.Atoi(sub[i+1])
-				tdh.HuDianPao[node.Card] = node.FengNum
+			if len(sub) > 0 {
+				for i := 0; i < len(sub); i += 2 {
+					node := &HuNode{}
+					node.Card, _ = strconv.Atoi(sub[i])
+					node.FengNum, _ = strconv.Atoi(sub[i+1])
+					tdh.HuDianPao[node.Card] = node.FengNum
+				}
 			}
 		}
 

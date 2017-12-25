@@ -8,12 +8,11 @@ import (
 
 func main() {
 	//handCards := []int{0, 0, 31, 31, 31}
-	handCards := []int{9, 9, 2, 2, 2, 3, 4, 5, 9, 10, 11, 12, 13, 14}
-	laizi := []int{5}
-	ok, dianshu := sxtdhmj.CanHuWithLaiZi(handCards, laizi)
+	handCards := []int{9, 9, 2, 2, 2, 33, 33, 33, 32, 32, 32, 31, 31, 31}
+	ok, fengNum := sxtdhmj.CanHu(handCards, 2, 33, true, true, false)
 	if !ok {
 		sxtdhmj.ShowHandCards(handCards)
 		fmt.Println("error")
 	}
-	fmt.Println("dianshu = ", dianshu)
+	fmt.Println("fengNum = ", fengNum)
 }
