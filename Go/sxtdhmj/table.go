@@ -14,8 +14,8 @@ type PuZi struct {
 }
 
 type HuNode struct {
-	card    int //胡的那张牌
-	fengNum int //胡这张牌的时候，带有的黑三风或中发白的数量
+	Card    int //胡的那张牌
+	FengNum int //胡这张牌的时候，带有的黑三风或中发白的数量
 }
 
 //TdhValue 生成的表的value定义
@@ -23,8 +23,16 @@ type TdhValue struct {
 	FengNum  int   //保存黑三风、中发白的数量
 	ZiMoList []int //保存只能自摸的牌，胡黑三风和中发白时，只能自摸。
 
-	HuZiMo    []*HuNode //保存所有可以自摸胡的牌，和对应的风的数量
-	HuDianPao []*HuNode //保存所有可以点炮胡的牌，和对应的风的数量
+	HuZiMo    map[int]int //保存所有可以自摸胡的牌，和对应的风的数量 <key: , vlaue: >
+	HuDianPao map[int]int //保存所有可以点炮胡的牌，和对应的风的数量 <key: , vlaue: >
+}
+
+//NewTable 新建TdhValue
+func NewTdhValue() *TdhValue {
+	value := &TdhValue{}
+	value.HuZiMo = make(map[int]int)
+	value.HuDianPao = make(map[int]int)
+	return value
 }
 
 //LaiZiNum 赖子的数量
@@ -111,9 +119,9 @@ func loadFromFile(name string, table *map[int]*TdhValue) {
 			sub := strings.Split(ziMoValue, ",")
 			for i := 0; i <= len(sub)/2; i += 2 {
 				node := &HuNode{}
-				node.card, _ = strconv.Atoi(sub[i])
-				node.fengNum, _ = strconv.Atoi(sub[i+1])
-				tdh.HuZiMo = append(tdh.HuZiMo, node)
+				node.Card, _ = strconv.Atoi(sub[i])
+				node.FengNum, _ = strconv.Atoi(sub[i+1])
+				tdh.HuZiMo[node.Card] = node.FengNum
 			}
 		}
 
@@ -121,9 +129,9 @@ func loadFromFile(name string, table *map[int]*TdhValue) {
 			sub := strings.Split(dianPaoValue, ",")
 			for i := 0; i <= len(sub)/2; i += 2 {
 				node := &HuNode{}
-				node.card, _ = strconv.Atoi(sub[i])
-				node.fengNum, _ = strconv.Atoi(sub[i+1])
-				tdh.HuDianPao = append(tdh.HuDianPao, node)
+				node.Card, _ = strconv.Atoi(sub[i])
+				node.FengNum, _ = strconv.Atoi(sub[i+1])
+				tdh.HuDianPao[node.Card] = node.FengNum
 			}
 		}
 
@@ -132,7 +140,7 @@ func loadFromFile(name string, table *map[int]*TdhValue) {
 }
 
 func dumpToFile(name string, table *map[int]*TdhValue) {
-	file, _ := os.OpenFile(name, os.O_WRONLY|os.O_CREATE, 0666)
+	file, _ := os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	defer file.Close()
 	buf := bufio.NewWriter(file)
 	for key, value := range *table {
@@ -141,20 +149,24 @@ func dumpToFile(name string, table *map[int]*TdhValue) {
 		fmt.Fprintf(buf, "%d", value.FengNum)
 		fmt.Fprintf(buf, "|")
 
+		bFirst := true
 		for i, v := range value.HuZiMo {
-			if i == 0 {
-				fmt.Fprintf(buf, "%d,%d", v.card, v.fengNum)
+			if bFirst {
+				bFirst = false
+				fmt.Fprintf(buf, "%d,%d", i, v)
 			} else {
-				fmt.Fprintf(buf, ",%d,%d", v.card, v.fengNum)
+				fmt.Fprintf(buf, ",%d,%d", i, v)
 			}
 		}
 		fmt.Fprintf(buf, "|")
 
+		bFirst = true
 		for i, v := range value.HuDianPao {
-			if i == 0 {
-				fmt.Fprintf(buf, "%d,%d", v.card, v.fengNum)
+			if bFirst {
+				bFirst = false
+				fmt.Fprintf(buf, "%d,%d", i, v)
 			} else {
-				fmt.Fprintf(buf, ",%d,%d", v.card, v.fengNum)
+				fmt.Fprintf(buf, ",%d,%d", i, v)
 			}
 		}
 

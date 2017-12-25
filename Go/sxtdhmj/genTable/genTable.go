@@ -139,26 +139,26 @@ func main() {
 		tableZiWithEyeTemp[i] = &map[int]*sxtdhmj.TdhValue{}
 	}
 
-	// genTableXuShu()
-	// genTableXuShuWithEye()
+	genTableXuShu()
+	genTableXuShuWithEye()
 
-	// genTableFengKe()
-	// genTableFengKeWithEye()
-	// genTableFeng()
-	// genTableFengWithEye()
-
-	// genTableJianKe()
-	// genTableJianKeWithEye()
-	// genTableJian()
-	// genTableJianWithEye()
-
-	// genTableZi()
-	// genTableZiWithEye()
-
+	genTableFengKe()
+	genTableFengKeWithEye()
 	genTableFeng()
 	genTableFengWithEye()
+
+	genTableJianKe()
+	genTableJianKeWithEye()
 	genTableJian()
 	genTableJianWithEye()
+
+	genTableZi()
+	genTableZiWithEye()
+
+	// genTableFeng()
+	// genTableFengWithEye()
+	// genTableJian()
+	// genTableJianWithEye()
 
 	tableMgr.Dump()
 }
@@ -522,7 +522,7 @@ func checkAndAdd(cards []int, iLaiZiNum int) bool {
 		return false //这里说明这个情况处理过了，去重。
 	}
 
-	v1 := &sxtdhmj.TdhValue{}
+	v1 := sxtdhmj.NewTdhValue()
 	(*HandCardsMapTemp)[key] = v1
 
 	for i := 0; i < curCardsTypeNum; i++ {
@@ -532,7 +532,7 @@ func checkAndAdd(cards []int, iLaiZiNum int) bool {
 	}
 
 	HandCardsMap := curTable[iLaiZiNum]
-	v2 := &sxtdhmj.TdhValue{}
+	v2 := sxtdhmj.NewTdhValue()
 	(*HandCardsMap)[key] = v2
 	return true
 }
@@ -544,20 +544,16 @@ func checkAndAddHeiSanFeng(cardsList *HandCardsList, cards []int, iLaiZiNum int,
 		key = key*10 + cards[i]
 	}
 
-	ziMoList := calcZiMoList(cardsList)
-
 	HandCardsMapTemp := curTableTemp[iLaiZiNum]
-	v, exists := (*HandCardsMapTemp)[key]
+	_, exists := (*HandCardsMapTemp)[key]
 	if exists {
-		if heiSanFengNum <= v.FengNum && len(cardsList.CommonList) == 0 {
-			return false //这里说明这个情况处理过了，去重。
-		}
+		// if heiSanFengNum <= v.FengNum {
+		// 	return false //这里说明这个情况处理过了，去重。
+		// }
 		(*HandCardsMapTemp)[key].FengNum = heiSanFengNum
-		//(*HandCardsMapTemp)[key].ZiMoList = ziMoList
 	} else {
-		v1 := &sxtdhmj.TdhValue{}
+		v1 := sxtdhmj.NewTdhValue()
 		v1.FengNum = heiSanFengNum
-		//v1.ZiMoList = ziMoList
 		(*HandCardsMapTemp)[key] = v1
 	}
 
@@ -567,91 +563,50 @@ func checkAndAddHeiSanFeng(cardsList *HandCardsList, cards []int, iLaiZiNum int,
 		}
 	}
 
-	if key == 4301 {
-		fmt.Printf("cardsList.CommonList = ")
-		for _, v := range cardsList.CommonList {
-			fmt.Printf("%d ", v)
-		}
-		fmt.Println()
-
-		fmt.Printf("cardsList.HeiSanFengList = ")
-		for _, v := range cardsList.HeiSanFengList {
-			fmt.Printf("%d ", v)
-		}
-		fmt.Println()
-
-		fmt.Println("(*curTable[iLaiZiNum])[key] = ", (*curTable[iLaiZiNum])[key])
-		fmt.Println("----------------------------------------------------")
-	}
-
 	HandCardsMap := curTable[iLaiZiNum]
 	if exists {
 		(*HandCardsMap)[key].FengNum = heiSanFengNum
-		mofidyZiMoList(cardsList, (*HandCardsMap)[key])
-		//(*HandCardsMap)[key].ZiMoList = ziMoList
 	} else {
-		v2 := &sxtdhmj.TdhValue{}
+		v2 := sxtdhmj.NewTdhValue()
 		v2.FengNum = heiSanFengNum
-		v2.ZiMoList = ziMoList
 		(*HandCardsMap)[key] = v2
 	}
+
+	analyseCardsList(cardsList, heiSanFengNum, (*HandCardsMap)[key])
+
 	return true
 }
 
-func mofidyZiMoList(cardsList *HandCardsList, v *sxtdhmj.TdhValue) {
-	if len(cardsList.CommonList) == 0 {
+func addToMap(Card int, FengNum int, mymap *map[int]int) {
+
+	if Card == 0 {
 		return
 	}
 
-	slots := [sxtdhmj.TILEMAX]int{}
-	for _, v := range v.ZiMoList {
-		slots[v] = 1
-	}
-
-	for _, v := range cardsList.CommonList {
-		slots[v.PuZi[0]] = 0
-		slots[v.PuZi[1]] = 0
-		slots[v.PuZi[2]] = 0
-	}
-
-	ziMoList := []int{}
-	for k, v := range slots {
-		if v == 1 {
-			ziMoList = append(ziMoList, k)
+	if v, ok := (*mymap)[Card]; ok {
+		if FengNum > v {
+			(*mymap)[Card] = FengNum
 		}
+	} else {
+		(*mymap)[Card] = FengNum
 	}
-
-	v.ZiMoList = nil
-	v.ZiMoList = append(v.ZiMoList, ziMoList...)
 }
 
-func calcZiMoList(cardsList *HandCardsList) []int {
-
-	if len(cardsList.HeiSanFengList) == 0 {
-		return nil
-	}
-
-	slots := [sxtdhmj.TILEMAX]int{}
-	for _, v := range cardsList.HeiSanFengList {
-		//log.Println("HeiSanFengList = ", v)
-		slots[v.PuZi[0]] = 1
-		slots[v.PuZi[1]] = 1
-		slots[v.PuZi[2]] = 1
-	}
+func analyseCardsList(cardsList *HandCardsList, heiSanFengNum int, tdhvalue *sxtdhmj.TdhValue) {
 
 	for _, v := range cardsList.CommonList {
-		//log.Println("CommonList = ", v)
-		slots[v.PuZi[0]] = 0
-		slots[v.PuZi[1]] = 0
-		slots[v.PuZi[2]] = 0
+		addToMap(v.PuZi[0], heiSanFengNum, &(tdhvalue.HuDianPao))
+		addToMap(v.PuZi[1], heiSanFengNum, &(tdhvalue.HuDianPao))
+		addToMap(v.PuZi[2], heiSanFengNum, &(tdhvalue.HuDianPao))
+
+		addToMap(v.PuZi[0], heiSanFengNum, &(tdhvalue.HuZiMo))
+		addToMap(v.PuZi[1], heiSanFengNum, &(tdhvalue.HuZiMo))
+		addToMap(v.PuZi[2], heiSanFengNum, &(tdhvalue.HuZiMo))
 	}
 
-	ziMoList := []int{}
-	for k, v := range slots {
-		if v == 1 {
-			ziMoList = append(ziMoList, k)
-		}
+	for _, v := range cardsList.HeiSanFengList {
+		addToMap(v.PuZi[0], heiSanFengNum, &(tdhvalue.HuZiMo))
+		addToMap(v.PuZi[1], heiSanFengNum, &(tdhvalue.HuZiMo))
+		addToMap(v.PuZi[2], heiSanFengNum, &(tdhvalue.HuZiMo))
 	}
-
-	return ziMoList
 }
