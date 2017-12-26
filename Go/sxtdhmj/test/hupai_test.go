@@ -1,7 +1,6 @@
 package main
 
 import (
-	"sort"
 	"testing"
 
 	"github.com/MDGSF/MJHuPai/Go/sxtdhmj"
@@ -384,24 +383,3 @@ type HuArray struct {
 }
 
 var count int
-
-func calcHandCardsKey(handCards []int) (int, []int) {
-	var slots [sxtdhmj.TILEMAX]int
-
-	var distinctCards []int
-	for _, c := range handCards {
-		slots[c]++
-		if slots[c] == 1 {
-			distinctCards = append(distinctCards, c)
-		}
-	}
-
-	sort.Ints(slots[:])
-
-	num := 0
-	for _, v := range slots {
-		num = num*10 + v
-	}
-
-	return num, distinctCards
-}
