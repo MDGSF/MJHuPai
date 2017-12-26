@@ -43,21 +43,38 @@ const (
 
 
 
-http://127.0.0.1:11188
+http://127.0.0.1:11189
 
 请求
 
 ```
 {
-	"handCards":[0, 0, 1, 1, 1],
-	"laizi":[1]
+	"handCards":[0, 0, 0, 3, 3, 3, 6, 6, 6, 27, 28, 29, 27, 27],
+	"huType":1,
+	"huCard":27,
+	"heiSanFeng":true,
+	"zhongFaBai":true,
+	"zhongFaWu":true
 }
+```
+
+```
+handCards: 就是手牌
+huType: 1自摸胡， 2点炮胡
+huCard: 就是自摸的那张牌，或者是点炮的那张牌
+heiSanFeng(黑三风): true开启，false关闭
+zhongFaBai(中发白): true开启，false关闭
+zhongFaWu(红发五): true开启，false关闭
 ```
 
 回复
 
 ```
-{"hu":true,"dianshu":10}
+{"hu":true,"fengNum":1}
 ```
 
+```
+hu: true可以胡牌， false不可以胡牌
+fengNum: 可以胡牌时，这个是手牌中风的数量(包括黑三风和中发白)。不能胡牌时，这个为0。
+```
 

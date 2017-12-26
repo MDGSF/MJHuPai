@@ -10,13 +10,17 @@ import (
 )
 
 type reqHandCards struct {
-	HandCards []int `json:"handCards"`
-	Laizi     []int `json:"laizi"`
+	HandCards  []int `json:"handCards"`
+	HuType     int   `json:"huType"`
+	HuCard     int   `json:"huCard"`
+	HeiSanFeng bool  `json:"heiSanFeng"`
+	ZhongFaBai bool  `json:"zhongFaBai"`
+	ZhongFaWu  bool  `json:"zhongFaWu"`
 }
 
 type resp struct {
 	Hu      bool `json:"hu"`
-	Dianshu int  `json:"dianshu"`
+	FengNum int  `json:"fengNum"`
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -35,13 +39,14 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(msgBag)
 
-	ret, dianshu := sxtdhmj.CanHuWithLaiZi(msgBag.HandCards, msgBag.Laizi)
+	ret, fengNum := sxtdhmj.CanHu(msgBag.HandCards, msgBag.HuType, msgBag.HuCard,
+		msgBag.HeiSanFeng, msgBag.ZhongFaBai, msgBag.ZhongFaWu)
 
-	fmt.Println(ret, dianshu)
+	fmt.Println(ret, fengNum)
 
 	respBag := &resp{}
 	respBag.Hu = ret
-	respBag.Dianshu = dianshu
+	respBag.FengNum = fengNum
 
 	b, err := json.Marshal(respBag)
 	if err != nil {
@@ -54,5 +59,5 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", indexHandler)
-	http.ListenAndServe("127.0.0.1:11188", nil)
+	http.ListenAndServe("127.0.0.1:11189", nil)
 }

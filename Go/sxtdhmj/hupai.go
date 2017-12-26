@@ -59,7 +59,8 @@ func CanHu(handCards []int, huType int, huCard int,
 		}
 
 		if len(Feng) > 0 {
-			ret2, fengNum2, heiSanFengNum2, zhongFaBaiNum2 := walkThroughTable(Feng, XuShu, Jian, TableFengWithEye, TableFeng, TableXuShu, TableJian)
+			ret2, fengNum2, heiSanFengNum2, zhongFaBaiNum2 := walkThroughTableFengJiang(Feng, XuShu, Jian,
+				TableFengWithEye, TableXuShu, TableJian, huType, huCard)
 			if ret2 && fengNum2 >= maxFengNum {
 				bCanHu = true
 				maxHeiSanFengNum = heiSanFengNum2
@@ -69,7 +70,8 @@ func CanHu(handCards []int, huType int, huCard int,
 		}
 
 		if len(Jian) > 0 {
-			ret3, fengNum3, heiSanFengNum3, zhongFaBaiNum3 := walkThroughTable(Jian, XuShu, Feng, TableJianWithEye, TableJian, TableXuShu, TableFeng)
+			ret3, fengNum3, heiSanFengNum3, zhongFaBaiNum3 := walkThroughTableJianJiang(Jian, XuShu, Feng,
+				TableJianWithEye, TableXuShu, TableFeng, huType, huCard)
 			if ret3 && fengNum3 >= maxFengNum {
 				bCanHu = true
 				maxHeiSanFengNum = heiSanFengNum3
@@ -89,6 +91,92 @@ func CanHu(handCards []int, huType int, huCard int,
 	// log.Println("maxFengNum = ", maxFengNum)
 
 	return bCanHu, maxFengNum
+}
+
+func walkThroughTableJianJiang(Jian []int, XuShu []int, Feng []int,
+	TableJianWithEye *Table, TableXuShu *Table, TableFeng *Table,
+	huType int, huCard int) (CanHu bool,
+	FengNum int, HeiSanFengNum int, ZhongFaBaiNum int) {
+
+	bInTable := false
+	maxHeiSanFengNum := 0
+	maxZhongFaBaiNum := 0
+
+	if len(Jian) > 0 {
+		if IsDragon(huCard) {
+			if maxZhongFaBaiNum, bInTable = TableJianWithEye.IsValid(Jian[0], huType, huCard); !bInTable {
+				return false, 0, 0, 0
+			}
+		} else {
+			if maxZhongFaBaiNum, bInTable = TableJianWithEye.IsInTableMap(Jian[0], 0); !bInTable {
+				return false, 0, 0, 0
+			}
+		}
+	}
+
+	for _, num := range XuShu {
+		if _, ok := TableXuShu.IsInTableMap(num, 0); !ok {
+			return false, 0, 0, 0
+		}
+	}
+
+	if len(Feng) > 0 {
+		if IsWind(huCard) {
+			if maxHeiSanFengNum, bInTable = TableFeng.IsValid(Feng[0], huType, huCard); !bInTable {
+				return false, 0, 0, 0
+			}
+		} else {
+			if maxHeiSanFengNum, bInTable = TableFeng.IsInTableMap(Feng[0], 0); !bInTable {
+				return false, 0, 0, 0
+			}
+		}
+	}
+
+	return true, maxHeiSanFengNum + maxZhongFaBaiNum, maxHeiSanFengNum, maxZhongFaBaiNum
+}
+
+func walkThroughTableFengJiang(Feng []int,
+	XuShu []int, Jian []int,
+	TableFengWithEye *Table,
+	TableXuShu *Table, TableJian *Table,
+	huType int, huCard int) (CanHu bool,
+	FengNum int, HeiSanFengNum int, ZhongFaBaiNum int) {
+
+	bInTable := false
+	maxHeiSanFengNum := 0
+	maxZhongFaBaiNum := 0
+
+	if len(Feng) > 0 {
+		if IsWind(huCard) {
+			if maxHeiSanFengNum, bInTable = TableFengWithEye.IsValid(Feng[0], huType, huCard); !bInTable {
+				return false, 0, 0, 0
+			}
+		} else {
+			if maxHeiSanFengNum, bInTable = TableFengWithEye.IsInTableMap(Feng[0], 0); !bInTable {
+				return false, 0, 0, 0
+			}
+		}
+	}
+
+	for _, num := range XuShu {
+		if _, ok := TableXuShu.IsInTableMap(num, 0); !ok {
+			return false, 0, 0, 0
+		}
+	}
+
+	if len(Jian) > 0 {
+		if IsDragon(huCard) {
+			if maxZhongFaBaiNum, bInTable = TableJian.IsValid(Jian[0], huType, huCard); !bInTable {
+				return false, 0, 0, 0
+			}
+		} else {
+			if maxZhongFaBaiNum, bInTable = TableJian.IsInTableMap(Jian[0], 0); !bInTable {
+				return false, 0, 0, 0
+			}
+		}
+	}
+
+	return true, maxHeiSanFengNum + maxZhongFaBaiNum, maxHeiSanFengNum, maxZhongFaBaiNum
 }
 
 func walkThroughTableXuShuJiang(XuShu []int,
@@ -127,17 +215,27 @@ func walkThroughTableXuShuJiang(XuShu []int,
 			}
 		}
 
-		for _, num := range Feng {
-			bInTable, curHeiSanFengNum = TableFeng.IsValid(num, huType, huCard)
-			if !bInTable {
-				return false, 0, 0, 0
+		if len(Feng) > 0 {
+			if IsWind(huCard) {
+				if curHeiSanFengNum, bInTable = TableFeng.IsValid(Feng[0], huType, huCard); !bInTable {
+					return false, 0, 0, 0
+				}
+			} else {
+				if curHeiSanFengNum, bInTable = TableFeng.IsInTableMap(Feng[0], 0); !bInTable {
+					return false, 0, 0, 0
+				}
 			}
 		}
 
-		for _, zNum := range Jian {
-			bInTable, curZhongFaBaiNum = TableJian.IsValid(zNum, huType, huCard)
-			if !bInTable {
-				return false, 0, 0, 0
+		if len(Jian) > 0 {
+			if IsDragon(huCard) {
+				if curZhongFaBaiNum, bInTable = TableJian.IsValid(Jian[0], huType, huCard); !bInTable {
+					return false, 0, 0, 0
+				}
+			} else {
+				if curZhongFaBaiNum, bInTable = TableJian.IsInTableMap(Jian[0], 0); !bInTable {
+					return false, 0, 0, 0
+				}
 			}
 		}
 
@@ -154,49 +252,6 @@ func walkThroughTableXuShuJiang(XuShu []int,
 	if bFound {
 		return true, maxFengNum, maxHeiSanFengNum, maxZhongFaBaiNum
 	}
-	return false, 0, 0, 0
-}
-
-func walkThroughTable(jiangArray []int,
-	commonArray1 []int, commonArray2 []int,
-	jTableWithEye *Table, jTableNoEye *Table,
-	cTableNoEye1 *Table, cTableNoEye2 *Table) (CanHu bool,
-	FengNum int, HeiSanFengNum int, ZhongFaBaiNum int) {
-
-	for i, iNum := range jiangArray {
-		_, ok := jTableWithEye.IsInTableMap(iNum, 0)
-		if !ok {
-			continue
-		}
-
-		for j, jNum := range jiangArray {
-			if i == j {
-				continue
-			}
-
-			_, ok := jTableNoEye.IsInTableMap(jNum, 0)
-			if !ok {
-				return false, 0, 0, 0
-			}
-		}
-
-		for _, num := range commonArray1 {
-			_, ok = cTableNoEye1.IsInTableMap(num, 0)
-			if !ok {
-				return false, 0, 0, 0
-			}
-		}
-
-		for _, zNum := range commonArray2 {
-			_, ok = cTableNoEye2.IsInTableMap(zNum, 0)
-			if !ok {
-				return false, 0, 0, 0
-			}
-		}
-
-		return true, 0, 0, 0
-	}
-
 	return false, 0, 0, 0
 }
 

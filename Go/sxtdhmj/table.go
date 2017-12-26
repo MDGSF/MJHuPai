@@ -61,20 +61,23 @@ func NewTable() *Table {
 }
 
 //IsInTable 判断num是否在这个表中
-func (table *Table) IsInTable(num int) (*TdhValue, int, bool) {
+func (table *Table) IsInTable(num int) (int, int, bool) {
 	for i := 0; i < LaiZiNum; i++ {
 		value, ok := table.IsInTableMap(num, i)
 		if ok {
 			return value, i, true
 		}
 	}
-	return nil, 0, false
+	return 0, 0, false
 }
 
 //IsInTableMap 判断num是不是在有iLaiZiNum个赖子的那个map中
-func (table *Table) IsInTableMap(num int, iLaiZiNum int) (*TdhValue, bool) {
+func (table *Table) IsInTableMap(num int, iLaiZiNum int) (int, bool) {
 	value, ok := (*table.Map[iLaiZiNum])[num]
-	return value, ok
+	if ok {
+		return value.FengNum, ok
+	}
+	return 0, false
 }
 
 /*
@@ -83,30 +86,30 @@ num:
 huType: 胡牌类型，1自摸，2点炮。
 huCard: 胡的那张牌，自摸的那张 或者是 点炮的那张。
 */
-func (table *Table) IsValid(num int, huType int, huCard int) (bInTable bool, maxFengNum int) {
+func (table *Table) IsValid(num int, huType int, huCard int) (maxFengNum int, bInTable bool) {
 
 	//因为推倒胡没有赖子，所以这里直接就查第一张表就好了。
 	value, ok := (*table.Map[0])[num]
 	if !ok {
-		return false, 0
+		return 0, false
 	}
 
 	//不是黑三风和中发白
 	if len(value.HuZiMo) == 0 && len(value.HuDianPao) == 0 {
-		return true, 0
+		return 0, true
 	}
 
 	if huType == 1 {
 		if v, ok := value.HuZiMo[huCard]; ok {
-			return true, v
+			return v, true
 		}
 	} else if huType == 2 {
 		if v, ok := value.HuDianPao[huCard]; ok {
-			return true, v
+			return v, true
 		}
 	}
 
-	return false, 0
+	return 0, false
 }
 
 //Load 加载表到内存中
