@@ -32,6 +32,10 @@
 
 山西推倒胡胡牌算法
 
+## Go/sxtjmj
+
+山西贴金胡牌算法
+
 ## Java
 
 http://hp.vector.co.jp/authors/VA046927/mjscore/mjalgorism.html
