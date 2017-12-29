@@ -205,44 +205,6 @@ func genTableFengKeWithEye() {
 	fmt.Println("genTableFengKeWithEye success")
 }
 
-func genTableFeng() {
-	fmt.Println("genTableFeng start")
-
-	curTable = &tableMgr.TableFeng.Map
-	curTableTemp = &tableFengTemp
-	curCardsTypeNum = 4
-	cards := []int{0, 0, 0, 0}
-	cardsList := &HandCardsList{}
-	genHeiSanFengPuZi(cardsList, cards, 1, 0)
-
-	fmt.Println("genTableFeng success")
-}
-
-func genTableFengWithEye() {
-	fmt.Println("genTableFengWithEye start")
-
-	curTable = &tableMgr.TableFengWithEye.Map
-	curTableTemp = &tableFengWithEyeTemp
-	curCardsTypeNum = 4
-
-	cards := []int{0, 0, 0, 0}
-	cardsList := &HandCardsList{}
-
-	for i := 0; i < curCardsTypeNum; i++ {
-		cards[i] = 2
-		cardsList.addNoFeng(sxtjmj.TON+i, sxtjmj.TON+i, 0)
-		//fmt.Println("genTableZiWithEye jiang = ", i)
-
-		checkAndAddHeiSanFeng(cardsList, cards, 0, 0)
-		genHeiSanFengPuZi(cardsList, cards, 1, 0)
-
-		cardsList.removeNoFeng(sxtjmj.TON+i, sxtjmj.TON+i, 0)
-		cards[i] = 0
-	}
-
-	fmt.Println("genTableFengWithEye success")
-}
-
 func genTableJianKe() {
 	fmt.Println("genTableJianKe start")
 
@@ -300,76 +262,6 @@ func genXuShuPuZi(cards []int, level int) {
 			cards[i+2]--
 		}
 	}
-}
-
-func genHeiSanFengPuZi(cardsList *HandCardsList, cards []int, level int, heiSanFengNum int) {
-	if level > 4 {
-		return
-	}
-
-	for i := 0; i < curCardsTypeNum; i++ {
-		if cards[i] > 3 {
-			continue
-		}
-
-		cards[i] += 3
-		cardsList.addNoFeng(sxtjmj.TON+i, sxtjmj.TON+i, sxtjmj.TON+i)
-
-		checkAndAddHeiSanFeng(cardsList, cards, 0, heiSanFengNum)
-		genHeiSanFengPuZi(cardsList, cards, level+1, heiSanFengNum)
-
-		cardsList.removeNoFeng(sxtjmj.TON+i, sxtjmj.TON+i, sxtjmj.TON+i)
-		cards[i] -= 3
-	}
-
-	for _, v := range heiSanFeng {
-		cards[v.PuZi[0]-sxtjmj.TON]++
-		cards[v.PuZi[1]-sxtjmj.TON]++
-		cards[v.PuZi[2]-sxtjmj.TON]++
-		cardsList.addFeng(v.PuZi[0], v.PuZi[1], v.PuZi[2])
-
-		checkAndAddHeiSanFeng(cardsList, cards, 0, heiSanFengNum+1)
-		genHeiSanFengPuZi(cardsList, cards, level+1, heiSanFengNum+1)
-
-		cardsList.removeFeng(v.PuZi[0], v.PuZi[1], v.PuZi[2])
-		cards[v.PuZi[0]-sxtjmj.TON]--
-		cards[v.PuZi[1]-sxtjmj.TON]--
-		cards[v.PuZi[2]-sxtjmj.TON]--
-	}
-}
-
-func genZhongFaBaiPuZi(cardsList *HandCardsList, cards []int, level int, zhongFaBaiNum int) {
-	if level > 4 {
-		return
-	}
-
-	for i := 0; i < curCardsTypeNum; i++ {
-		if cards[i] > 3 {
-			continue
-		}
-
-		cards[i] += 3
-		cardsList.addNoFeng(sxtjmj.HAK+i, sxtjmj.HAK+i, sxtjmj.HAK+i)
-
-		checkAndAddHeiSanFeng(cardsList, cards, 0, zhongFaBaiNum)
-		genZhongFaBaiPuZi(cardsList, cards, level+1, zhongFaBaiNum)
-
-		cardsList.removeNoFeng(sxtjmj.HAK+i, sxtjmj.HAK+i, sxtjmj.HAK+i)
-		cards[i] -= 3
-	}
-
-	cards[0]++
-	cards[1]++
-	cards[2]++
-	cardsList.addFeng(sxtjmj.HAK+0, sxtjmj.HAK+1, sxtjmj.HAK+2)
-
-	checkAndAddHeiSanFeng(cardsList, cards, 0, zhongFaBaiNum+1)
-	genZhongFaBaiPuZi(cardsList, cards, level+1, zhongFaBaiNum+1)
-
-	cardsList.removeFeng(sxtjmj.HAK+0, sxtjmj.HAK+1, sxtjmj.HAK+2)
-	cards[0]--
-	cards[1]--
-	cards[2]--
 }
 
 func genZiPuZi(cards []int, level int) {
@@ -446,6 +338,39 @@ func checkAndAdd(cards []int, iLaiZiNum int) bool {
 	return true
 }
 
+func addToMap(Card int, FengNum int, mymap *map[int]int) {
+	if Card == 0 {
+		return
+	}
+
+	if v, ok := (*mymap)[Card]; ok {
+		if FengNum > v {
+			(*mymap)[Card] = FengNum
+		}
+	} else {
+		(*mymap)[Card] = FengNum
+	}
+}
+
+func analyseCardsList(cardsList *HandCardsList, heiSanFengNum int, tdhvalue *sxtjmj.TdhValue) {
+
+	for _, v := range cardsList.CommonList {
+		addToMap(v.PuZi[0], heiSanFengNum, &(tdhvalue.HuDianPao))
+		addToMap(v.PuZi[1], heiSanFengNum, &(tdhvalue.HuDianPao))
+		addToMap(v.PuZi[2], heiSanFengNum, &(tdhvalue.HuDianPao))
+
+		addToMap(v.PuZi[0], heiSanFengNum, &(tdhvalue.HuZiMo))
+		addToMap(v.PuZi[1], heiSanFengNum, &(tdhvalue.HuZiMo))
+		addToMap(v.PuZi[2], heiSanFengNum, &(tdhvalue.HuZiMo))
+	}
+
+	for _, v := range cardsList.HeiSanFengList {
+		addToMap(v.PuZi[0], heiSanFengNum, &(tdhvalue.HuZiMo))
+		addToMap(v.PuZi[1], heiSanFengNum, &(tdhvalue.HuZiMo))
+		addToMap(v.PuZi[2], heiSanFengNum, &(tdhvalue.HuZiMo))
+	}
+}
+
 func checkAndAddHeiSanFeng(cardsList *HandCardsList, cards []int, iLaiZiNum int, heiSanFengNum int) bool {
 
 	key := 0
@@ -486,36 +411,76 @@ func checkAndAddHeiSanFeng(cardsList *HandCardsList, cards []int, iLaiZiNum int,
 	return true
 }
 
-func addToMap(Card int, FengNum int, mymap *map[int]int) {
-
-	if Card == 0 {
+func genHeiSanFengPuZi(cardsList *HandCardsList, cards []int, level int, heiSanFengNum int) {
+	if level > 4 {
 		return
 	}
 
-	if v, ok := (*mymap)[Card]; ok {
-		if FengNum > v {
-			(*mymap)[Card] = FengNum
+	for i := 0; i < curCardsTypeNum; i++ {
+		if cards[i] > 3 {
+			continue
 		}
-	} else {
-		(*mymap)[Card] = FengNum
+
+		cards[i] += 3
+		cardsList.addNoFeng(sxtjmj.TON+i, sxtjmj.TON+i, sxtjmj.TON+i)
+
+		checkAndAddHeiSanFeng(cardsList, cards, 0, heiSanFengNum)
+		genHeiSanFengPuZi(cardsList, cards, level+1, heiSanFengNum)
+
+		cardsList.removeNoFeng(sxtjmj.TON+i, sxtjmj.TON+i, sxtjmj.TON+i)
+		cards[i] -= 3
+	}
+
+	for _, v := range heiSanFeng {
+		cards[v.PuZi[0]-sxtjmj.TON]++
+		cards[v.PuZi[1]-sxtjmj.TON]++
+		cards[v.PuZi[2]-sxtjmj.TON]++
+		cardsList.addFeng(v.PuZi[0], v.PuZi[1], v.PuZi[2])
+
+		checkAndAddHeiSanFeng(cardsList, cards, 0, heiSanFengNum+1)
+		genHeiSanFengPuZi(cardsList, cards, level+1, heiSanFengNum+1)
+
+		cardsList.removeFeng(v.PuZi[0], v.PuZi[1], v.PuZi[2])
+		cards[v.PuZi[0]-sxtjmj.TON]--
+		cards[v.PuZi[1]-sxtjmj.TON]--
+		cards[v.PuZi[2]-sxtjmj.TON]--
 	}
 }
 
-func analyseCardsList(cardsList *HandCardsList, heiSanFengNum int, tdhvalue *sxtjmj.TdhValue) {
+func genTableFeng() {
+	fmt.Println("genTableFeng start")
 
-	for _, v := range cardsList.CommonList {
-		addToMap(v.PuZi[0], heiSanFengNum, &(tdhvalue.HuDianPao))
-		addToMap(v.PuZi[1], heiSanFengNum, &(tdhvalue.HuDianPao))
-		addToMap(v.PuZi[2], heiSanFengNum, &(tdhvalue.HuDianPao))
+	curTable = &tableMgr.TableFeng.Map
+	curTableTemp = &tableFengTemp
+	curCardsTypeNum = 4
+	cards := []int{0, 0, 0, 0}
+	cardsList := &HandCardsList{}
+	genHeiSanFengPuZi(cardsList, cards, 1, 0)
 
-		addToMap(v.PuZi[0], heiSanFengNum, &(tdhvalue.HuZiMo))
-		addToMap(v.PuZi[1], heiSanFengNum, &(tdhvalue.HuZiMo))
-		addToMap(v.PuZi[2], heiSanFengNum, &(tdhvalue.HuZiMo))
+	fmt.Println("genTableFeng success")
+}
+
+func genTableFengWithEye() {
+	fmt.Println("genTableFengWithEye start")
+
+	curTable = &tableMgr.TableFengWithEye.Map
+	curTableTemp = &tableFengWithEyeTemp
+	curCardsTypeNum = 4
+
+	cards := []int{0, 0, 0, 0}
+	cardsList := &HandCardsList{}
+
+	for i := 0; i < curCardsTypeNum; i++ {
+		cards[i] = 2
+		cardsList.addNoFeng(sxtjmj.TON+i, sxtjmj.TON+i, 0)
+		//fmt.Println("genTableZiWithEye jiang = ", i)
+
+		checkAndAddHeiSanFeng(cardsList, cards, 0, 0)
+		genHeiSanFengPuZi(cardsList, cards, 1, 0)
+
+		cardsList.removeNoFeng(sxtjmj.TON+i, sxtjmj.TON+i, 0)
+		cards[i] = 0
 	}
 
-	for _, v := range cardsList.HeiSanFengList {
-		addToMap(v.PuZi[0], heiSanFengNum, &(tdhvalue.HuZiMo))
-		addToMap(v.PuZi[1], heiSanFengNum, &(tdhvalue.HuZiMo))
-		addToMap(v.PuZi[2], heiSanFengNum, &(tdhvalue.HuZiMo))
-	}
+	fmt.Println("genTableFengWithEye success")
 }
