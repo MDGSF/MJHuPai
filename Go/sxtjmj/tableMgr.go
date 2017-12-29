@@ -70,44 +70,44 @@ func NewTableMgr() *TableMgr {
 func (tableMgr *TableMgr) Load(directory string) {
 
 	//序数牌
-	tableMgr.TableXuShu.Load(directory + "sxtdh_tbl/TableXuShu")
-	tableMgr.TableXuShuWithEye.Load(directory + "sxtdh_tbl/TableXuShuWithEye")
+	tableMgr.TableXuShu.Load(directory + "sxtj_tbl/TableXuShu")
+	tableMgr.TableXuShuWithEye.Load(directory + "sxtj_tbl/TableXuShuWithEye")
 
 	//风牌
-	tableMgr.TableFengKe.Load(directory + "sxtdh_tbl/TableFengKe")
-	tableMgr.TableFengKeWithEye.Load(directory + "sxtdh_tbl/TableFengKeWithEye")
-	tableMgr.TableFeng.Load(directory + "sxtdh_tbl/TableFeng")
-	tableMgr.TableFengWithEye.Load(directory + "sxtdh_tbl/TableFengWithEye")
+	tableMgr.TableFengKe.Load(directory + "sxtj_tbl/TableFengKe")
+	tableMgr.TableFengKeWithEye.Load(directory + "sxtj_tbl/TableFengKeWithEye")
+	tableMgr.TableFeng.Load(directory + "sxtj_tbl/TableFeng")
+	tableMgr.TableFengWithEye.Load(directory + "sxtj_tbl/TableFengWithEye")
 
 	//箭牌
-	tableMgr.TableJianKe.Load(directory + "sxtdh_tbl/TableJianKe")
-	tableMgr.TableJianKeWithEye.Load(directory + "sxtdh_tbl/TableJianKeWithEye")
-	tableMgr.TableJian.Load(directory + "sxtdh_tbl/TableJian")
-	tableMgr.TableJianWithEye.Load(directory + "sxtdh_tbl/TableJianWithEye")
+	tableMgr.TableJianKe.Load(directory + "sxtj_tbl/TableJianKe")
+	tableMgr.TableJianKeWithEye.Load(directory + "sxtj_tbl/TableJianKeWithEye")
+	tableMgr.TableJian.Load(directory + "sxtj_tbl/TableJian")
+	tableMgr.TableJianWithEye.Load(directory + "sxtj_tbl/TableJianWithEye")
 
-	tableMgr.TableZi.Load(directory + "sxtdh_tbl/TableZi")
-	tableMgr.TableZiWithEye.Load(directory + "sxtdh_tbl/TableZiWithEye")
+	tableMgr.TableZi.Load(directory + "sxtj_tbl/TableZi")
+	tableMgr.TableZiWithEye.Load(directory + "sxtj_tbl/TableZiWithEye")
 }
 
 //Dump 固化所有内存中的表
 func (tableMgr *TableMgr) Dump() {
 
 	//序数牌
-	tableMgr.TableXuShu.Dump("sxtdh_tbl/TableXuShu")
-	tableMgr.TableXuShuWithEye.Dump("sxtdh_tbl/TableXuShuWithEye")
+	tableMgr.TableXuShu.Dump("sxtj_tbl/TableXuShu")
+	tableMgr.TableXuShuWithEye.Dump("sxtj_tbl/TableXuShuWithEye")
 
 	//风牌
-	tableMgr.TableFengKe.Dump("sxtdh_tbl/TableFengKe")
-	tableMgr.TableFengKeWithEye.Dump("sxtdh_tbl/TableFengKeWithEye")
-	tableMgr.TableFeng.Dump("sxtdh_tbl/TableFeng")
-	tableMgr.TableFengWithEye.Dump("sxtdh_tbl/TableFengWithEye")
+	tableMgr.TableFengKe.Dump("sxtj_tbl/TableFengKe")
+	tableMgr.TableFengKeWithEye.Dump("sxtj_tbl/TableFengKeWithEye")
+	tableMgr.TableFeng.Dump("sxtj_tbl/TableFeng")
+	tableMgr.TableFengWithEye.Dump("sxtj_tbl/TableFengWithEye")
 
 	//箭牌
-	tableMgr.TableJianKe.Dump("sxtdh_tbl/TableJianKe")
-	tableMgr.TableJianKeWithEye.Dump("sxtdh_tbl/TableJianKeWithEye")
-	tableMgr.TableJian.Dump("sxtdh_tbl/TableJian")
-	tableMgr.TableJianWithEye.Dump("sxtdh_tbl/TableJianWithEye")
+	tableMgr.TableJianKe.Dump("sxtj_tbl/TableJianKe")
+	tableMgr.TableJianKeWithEye.Dump("sxtj_tbl/TableJianKeWithEye")
+	tableMgr.TableJian.Dump("sxtj_tbl/TableJian")
+	tableMgr.TableJianWithEye.Dump("sxtj_tbl/TableJianWithEye")
 
-	tableMgr.TableZi.Dump("sxtdh_tbl/TableZi")
-	tableMgr.TableZiWithEye.Dump("sxtdh_tbl/TableZiWithEye")
+	tableMgr.TableZi.Dump("sxtj_tbl/TableZi")
+	tableMgr.TableZiWithEye.Dump("sxtj_tbl/TableZiWithEye")
 }

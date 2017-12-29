@@ -8,7 +8,7 @@ var tableMgr *TableMgr
 
 func init() {
 	tableMgr = NewTableMgr()
-	tableMgr.Load("E:\\Go\\GOPATH\\src\\github.com\\MDGSF\\MJHuPai\\Go\\sxtjmj\\genTable\\")
+	//tableMgr.Load("E:\\Go\\GOPATH\\src\\github.com\\MDGSF\\MJHuPai\\Go\\sxtjmj\\genTable\\")
 	//tableMgr.Load(".\\")
 }
 
