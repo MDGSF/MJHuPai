@@ -267,13 +267,8 @@ func getFengTable(HeiSanFeng bool) (TableFeng, TableFengWithEye *Table) {
 }
 
 func getJianTable(ZhongFaBai bool, ZhongFaWu bool) (TableJian, TableJianWithEye *Table) {
-	if ZhongFaBai || ZhongFaWu {
-		TableJian = tableMgr.TableJian
-		TableJianWithEye = tableMgr.TableJianWithEye
-	} else {
-		TableJian = tableMgr.TableJianKe
-		TableJianWithEye = tableMgr.TableJianKeWithEye
-	}
+	TableJian = tableMgr.TableJianKe
+	TableJianWithEye = tableMgr.TableJianKeWithEye
 	return
 }
 

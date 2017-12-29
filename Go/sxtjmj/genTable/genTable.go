@@ -75,11 +75,6 @@ var tableFengWithEyeTemp = [LaiZiNum]*map[int]*sxtjmj.TdhValue{}
 //箭牌
 var tableJianKeTemp = [LaiZiNum]*map[int]*sxtjmj.TdhValue{}
 var tableJianKeWithEyeTemp = [LaiZiNum]*map[int]*sxtjmj.TdhValue{}
-var tableJianTemp = [LaiZiNum]*map[int]*sxtjmj.TdhValue{}
-var tableJianWithEyeTemp = [LaiZiNum]*map[int]*sxtjmj.TdhValue{}
-
-var tableZiTemp = [LaiZiNum]*map[int]*sxtjmj.TdhValue{}
-var tableZiWithEyeTemp = [LaiZiNum]*map[int]*sxtjmj.TdhValue{}
 
 var curTable *[LaiZiNum]*map[int]*sxtjmj.TdhValue
 var curTableTemp *[LaiZiNum]*map[int]*sxtjmj.TdhValue
@@ -132,11 +127,6 @@ func main() {
 
 		tableJianKeTemp[i] = &map[int]*sxtjmj.TdhValue{}
 		tableJianKeWithEyeTemp[i] = &map[int]*sxtjmj.TdhValue{}
-		tableJianTemp[i] = &map[int]*sxtjmj.TdhValue{}
-		tableJianWithEyeTemp[i] = &map[int]*sxtjmj.TdhValue{}
-
-		tableZiTemp[i] = &map[int]*sxtjmj.TdhValue{}
-		tableZiWithEyeTemp[i] = &map[int]*sxtjmj.TdhValue{}
 	}
 
 	genTableXuShu()
@@ -149,16 +139,6 @@ func main() {
 
 	genTableJianKe()
 	genTableJianKeWithEye()
-	genTableJian()
-	genTableJianWithEye()
-
-	genTableZi()
-	genTableZiWithEye()
-
-	// genTableFeng()
-	// genTableFengWithEye()
-	// genTableJian()
-	// genTableJianWithEye()
 
 	tableMgr.Dump()
 }
@@ -294,76 +274,6 @@ func genTableJianKeWithEye() {
 	fmt.Println("genTableJianKeWithEye success")
 }
 
-func genTableJian() {
-	fmt.Println("genTableJian start")
-
-	curTable = &tableMgr.TableJian.Map
-	curTableTemp = &tableJianTemp
-	curCardsTypeNum = 3
-
-	cards := []int{0, 0, 0}
-	cardsList := &HandCardsList{}
-
-	genZhongFaBaiPuZi(cardsList, cards, 1, 0)
-
-	fmt.Println("genTableJian success")
-}
-
-func genTableJianWithEye() {
-	fmt.Println("genTableJianWithEye start")
-
-	curTable = &tableMgr.TableJianWithEye.Map
-	curTableTemp = &tableJianWithEyeTemp
-	curCardsTypeNum = 3
-
-	cards := []int{0, 0, 0}
-	cardsList := &HandCardsList{}
-
-	for i := 0; i < curCardsTypeNum; i++ {
-		cards[i] = 2
-		cardsList.addNoFeng(sxtjmj.HAK+i, sxtjmj.HAK+i, 0)
-
-		checkAndAddHeiSanFeng(cardsList, cards, 0, 0)
-		genZhongFaBaiPuZi(cardsList, cards, 1, 0)
-
-		cardsList.removeNoFeng(sxtjmj.HAK+i, sxtjmj.HAK+i, 0)
-		cards[i] = 0
-	}
-
-	fmt.Println("genTableJianWithEye success")
-}
-
-func genTableZi() {
-	fmt.Println("genTableZi start")
-
-	curTable = &tableMgr.TableZi.Map
-	curTableTemp = &tableZiTemp
-	curCardsTypeNum = 7
-	cards := []int{0, 0, 0, 0, 0, 0, 0}
-	genZiPuZi(cards, 1)
-
-	fmt.Println("genTableZi success")
-}
-
-func genTableZiWithEye() {
-	fmt.Println("genTableZiWithEye start")
-
-	curTable = &tableMgr.TableZiWithEye.Map
-	curTableTemp = &tableZiWithEyeTemp
-	curCardsTypeNum = 7
-
-	cards := []int{0, 0, 0, 0, 0, 0, 0}
-	for i := 0; i < curCardsTypeNum; i++ {
-		cards[i] = 2
-		//fmt.Println("genTableZiWithEye jiang = ", i)
-		addToXuShu(cards)
-		genZiPuZi(cards, 1)
-		cards[i] = 0
-	}
-
-	fmt.Println("genTableZiWithEye success")
-}
-
 func genXuShuPuZi(cards []int, level int) {
 
 	if level > 4 {
@@ -484,8 +394,7 @@ func addToXuShu(cards []int) {
 		return
 	}
 
-	//没有赖子，暂时不需要这些，先注释掉
-	//addToXuShuSub(cards, 1)
+	addToXuShuSub(cards, 1)
 }
 
 func addToXuShuSub(cards []int, iLaiZiNum int) {

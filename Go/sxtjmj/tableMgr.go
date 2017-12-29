@@ -26,18 +26,6 @@ type TableMgr struct {
 
 	// TableJianKeWithEye 箭牌只组成刻子带将
 	TableJianKeWithEye *Table
-
-	// TableJian 箭牌组成刻子和中发白不带将
-	TableJian *Table
-
-	// TableJianWithEye 箭牌组成刻子和中发白带将
-	TableJianWithEye *Table
-
-	// TableZi 字牌不带将
-	TableZi *Table
-
-	// TableZiWithEye 字牌带将
-	TableZiWithEye *Table
 }
 
 //NewTableMgr 新建一个表管理工具
@@ -57,11 +45,6 @@ func NewTableMgr() *TableMgr {
 	//箭牌
 	tableMgr.TableJianKe = NewTable()
 	tableMgr.TableJianKeWithEye = NewTable()
-	tableMgr.TableJian = NewTable()
-	tableMgr.TableJianWithEye = NewTable()
-
-	tableMgr.TableZi = NewTable()
-	tableMgr.TableZiWithEye = NewTable()
 
 	return tableMgr
 }
@@ -82,11 +65,6 @@ func (tableMgr *TableMgr) Load(directory string) {
 	//箭牌
 	tableMgr.TableJianKe.Load(directory + "sxtj_tbl/TableJianKe")
 	tableMgr.TableJianKeWithEye.Load(directory + "sxtj_tbl/TableJianKeWithEye")
-	tableMgr.TableJian.Load(directory + "sxtj_tbl/TableJian")
-	tableMgr.TableJianWithEye.Load(directory + "sxtj_tbl/TableJianWithEye")
-
-	tableMgr.TableZi.Load(directory + "sxtj_tbl/TableZi")
-	tableMgr.TableZiWithEye.Load(directory + "sxtj_tbl/TableZiWithEye")
 }
 
 //Dump 固化所有内存中的表
@@ -105,9 +83,4 @@ func (tableMgr *TableMgr) Dump() {
 	//箭牌
 	tableMgr.TableJianKe.Dump("sxtj_tbl/TableJianKe")
 	tableMgr.TableJianKeWithEye.Dump("sxtj_tbl/TableJianKeWithEye")
-	tableMgr.TableJian.Dump("sxtj_tbl/TableJian")
-	tableMgr.TableJianWithEye.Dump("sxtj_tbl/TableJianWithEye")
-
-	tableMgr.TableZi.Dump("sxtj_tbl/TableZi")
-	tableMgr.TableZiWithEye.Dump("sxtj_tbl/TableZiWithEye")
 }
