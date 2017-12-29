@@ -11,6 +11,18 @@ type HandCardsList struct {
 	HeiSanFengList []*sxtjmj.PuZi //保存黑三风和中发白
 }
 
+func (cardList *HandCardsList) getCommonCards() map[int]int {
+	cardsmap := make(map[int]int)
+	for _, v1 := range cardList.CommonList {
+		for _, v2 := range v1.PuZi {
+			if _, ok := cardsmap[v2]; !ok {
+				cardsmap[v2] = 1
+			}
+		}
+	}
+	return cardsmap
+}
+
 func (cardList *HandCardsList) addNoFeng(c1 int, c2 int, c3 int) {
 	puzi := &sxtjmj.PuZi{}
 	puzi.PuZi[0] = c1
@@ -411,6 +423,53 @@ func checkAndAddHeiSanFeng(cardsList *HandCardsList, cards []int, iLaiZiNum int,
 	return true
 }
 
+func addToHeiSanFengSub(cardsList *HandCardsList, cards []int, iLaiZiNum int, heiSanFengNum int) {
+	if iLaiZiNum >= LaiZiNum {
+		return
+	}
+
+	commonCards := cardsList.getCommonCards()
+	for _, v := range commonCards {
+		if cards[v] == 0 {
+			continue
+		}
+
+		cards[v]--
+		if !checkAndAddHeiSanFeng(cardsList, cards, iLaiZiNum, heiSanFengNum) {
+			cards[v]++
+			continue
+		}
+
+		addToHeiSanFengSub(cardsList, cards, iLaiZiNum+1, heiSanFengNum)
+		cards[v]++
+	}
+
+	// for i := 0; i < curCardsTypeNum; i++ {
+	// 	if cards[i] == 0 {
+	// 		continue
+	// 	}
+
+	// 	//这里需要修改，赖子只能替换cardsList中的CommonList
+	// 	//所以这里需要去遍历CommonList中的每一张牌。
+	// 	cards[i]--
+	// 	if !checkAndAddHeiSanFeng(cardsList, cards, iLaiZiNum, heiSanFengNum) {
+	// 		cards[i]++
+	// 		continue
+	// 	}
+
+	// 	addToHeiSanFengSub(cardsList, cards, iLaiZiNum+1, heiSanFengNum)
+	// 	cards[i]++
+	// }
+}
+
+func addToHeiSanFeng(cardsList *HandCardsList, cards []int, heiSanFengNum int) {
+	if !checkAndAddHeiSanFeng(cardsList, cards, 0, heiSanFengNum) {
+		return
+	}
+
+	addToHeiSanFengSub(cardsList, cards, 1, heiSanFengNum)
+}
+
 func genHeiSanFengPuZi(cardsList *HandCardsList, cards []int, level int, heiSanFengNum int) {
 	if level > 4 {
 		return
@@ -424,7 +483,7 @@ func genHeiSanFengPuZi(cardsList *HandCardsList, cards []int, level int, heiSanF
 		cards[i] += 3
 		cardsList.addNoFeng(sxtjmj.TON+i, sxtjmj.TON+i, sxtjmj.TON+i)
 
-		checkAndAddHeiSanFeng(cardsList, cards, 0, heiSanFengNum)
+		addToHeiSanFeng(cardsList, cards, heiSanFengNum)
 		genHeiSanFengPuZi(cardsList, cards, level+1, heiSanFengNum)
 
 		cardsList.removeNoFeng(sxtjmj.TON+i, sxtjmj.TON+i, sxtjmj.TON+i)
@@ -437,7 +496,7 @@ func genHeiSanFengPuZi(cardsList *HandCardsList, cards []int, level int, heiSanF
 		cards[v.PuZi[2]-sxtjmj.TON]++
 		cardsList.addFeng(v.PuZi[0], v.PuZi[1], v.PuZi[2])
 
-		checkAndAddHeiSanFeng(cardsList, cards, 0, heiSanFengNum+1)
+		addToHeiSanFeng(cardsList, cards, heiSanFengNum+1)
 		genHeiSanFengPuZi(cardsList, cards, level+1, heiSanFengNum+1)
 
 		cardsList.removeFeng(v.PuZi[0], v.PuZi[1], v.PuZi[2])
