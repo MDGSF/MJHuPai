@@ -16,9 +16,21 @@
 
 麻将子通用定义
 
-## Go
+## Go/mj
 
 麻将通用胡牌算法实现。(https://github.com/yuanfengyun/qipai.git)
+
+## Go/dfmj
+
+大丰麻将胡牌算法
+
+## Go/kddmj
+
+山西扣点点胡牌算法
+
+## Go/sxtdhmj
+
+山西推倒胡胡牌算法
 
 ## Java
 
