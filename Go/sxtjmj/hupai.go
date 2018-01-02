@@ -58,24 +58,30 @@ func CanHu(handCards []int, huType int, huCard int, HeiSanFeng bool, laizi []int
 			if ret1 && fengNum1 >= maxFengNum {
 				bCanHu = true
 				maxFengNum = fengNum1
+				log.Println("walkThroughTableXuShuJiang bCanHu = true, fengNum1 = ", fengNum1)
+				log.Println(XuShu, Feng, Jian, v.laiziNum)
 			}
 		}
 
 		if len(Feng) > 0 {
-			ret2, fengNum2, _, _ := walkThroughTableFengJiang(Feng, XuShu, Jian,
+			ret2, fengNum2 := walkThroughTableFengJiang(v.laiziNum, Feng, XuShu, Jian,
 				TableFengWithEye, TableXuShu, TableJian, huType, huCard)
 			if ret2 && fengNum2 >= maxFengNum {
 				bCanHu = true
 				maxFengNum = fengNum2
+				log.Println("walkThroughTableFengJiang bCanHu = true, fengNum2 = ", fengNum2)
+				log.Println(XuShu, Feng, Jian, v.laiziNum)
 			}
 		}
 
 		if len(Jian) > 0 {
-			ret3, fengNum3, _, _ := walkThroughTableJianJiang(Jian, XuShu, Feng,
+			ret3, fengNum3 := walkThroughTableJianJiang(v.laiziNum, Jian, XuShu, Feng,
 				TableJianWithEye, TableXuShu, TableFeng, huType, huCard)
 			if ret3 && fengNum3 >= maxFengNum {
 				bCanHu = true
 				maxFengNum = fengNum3
+				log.Println("walkThroughTableJianJiang bCanHu = true, fengNum3 = ", fengNum3)
+				log.Println(XuShu, Feng, Jian, v.laiziNum)
 			}
 		}
 
@@ -111,79 +117,94 @@ func isAllLaiZi(handCards []int, laizi []int) bool {
 	return false
 }
 
-func walkThroughTableJianJiang(Jian []int, XuShu []int, Feng []int,
+func walkThroughTableJianJiang(laiziNum int, Jian []int, XuShu []int, Feng []int,
 	TableJianWithEye *Table, TableXuShu *Table, TableFeng *Table,
-	huType int, huCard int) (CanHu bool,
-	FengNum int, HeiSanFengNum int, ZhongFaBaiNum int) {
+	huType int, huCard int) (CanHu bool, FengNum int) {
 
-	bInTable := false
-	maxHeiSanFengNum := 0
-	maxZhongFaBaiNum := 0
+	hasLaiZiNum := laiziNum
+	maxFengNum := 0
+	needLaiZiNum := 0
+	ok := false
 
 	if len(Jian) > 0 {
-		if maxZhongFaBaiNum, bInTable = TableJianWithEye.IsInTableMap(Jian[0], 0); !bInTable {
-			return false, 0, 0, 0
+		_, needLaiZiNum, ok = TableJianWithEye.IsInTable(Jian[0])
+		if !ok || needLaiZiNum > hasLaiZiNum {
+			return false, 0
 		}
+		hasLaiZiNum -= needLaiZiNum
 	}
 
 	for _, num := range XuShu {
-		if _, ok := TableXuShu.IsInTableMap(num, 0); !ok {
-			return false, 0, 0, 0
+		_, needLaiZiNum, ok = TableXuShu.IsInTable(num)
+		if !ok || needLaiZiNum > hasLaiZiNum {
+			continue
 		}
+		hasLaiZiNum -= needLaiZiNum
 	}
 
 	if len(Feng) > 0 {
 		if IsWind(huCard) {
-			if maxHeiSanFengNum, _, bInTable = TableFeng.IsValid(Feng[0], huType, huCard); !bInTable {
-				return false, 0, 0, 0
+			maxFengNum, needLaiZiNum, ok = TableFeng.IsValid(Feng[0], huType, huCard)
+			if !ok || needLaiZiNum > hasLaiZiNum {
+				return false, 0
 			}
+			hasLaiZiNum -= needLaiZiNum
 		} else {
-			if maxHeiSanFengNum, bInTable = TableFeng.IsInTableMap(Feng[0], 0); !bInTable {
-				return false, 0, 0, 0
+			maxFengNum, needLaiZiNum, ok = TableFeng.IsInTable(Feng[0])
+			if !ok || needLaiZiNum > hasLaiZiNum {
+				return false, 0
 			}
+			hasLaiZiNum -= needLaiZiNum
 		}
 	}
 
-	return true, maxHeiSanFengNum + maxZhongFaBaiNum, maxHeiSanFengNum, maxZhongFaBaiNum
+	return true, maxFengNum
 }
 
-func walkThroughTableFengJiang(Feng []int,
+func walkThroughTableFengJiang(laiziNum int, Feng []int,
 	XuShu []int, Jian []int,
 	TableFengWithEye *Table,
 	TableXuShu *Table, TableJian *Table,
-	huType int, huCard int) (CanHu bool,
-	FengNum int, HeiSanFengNum int, ZhongFaBaiNum int) {
+	huType int, huCard int) (CanHu bool, FengNum int) {
 
-	bInTable := false
-	maxHeiSanFengNum := 0
-	maxZhongFaBaiNum := 0
+	hasLaiZiNum := laiziNum
+	maxFengNum := 0
+	needLaiZiNum := 0
+	ok := false
 
 	if len(Feng) > 0 {
 		if IsWind(huCard) {
-			maxHeiSanFengNum, _, bInTable = TableFengWithEye.IsValid(Feng[0], huType, huCard)
-			if !bInTable {
-				return false, 0, 0, 0
+			maxFengNum, needLaiZiNum, ok = TableFengWithEye.IsValid(Feng[0], huType, huCard)
+			if !ok || needLaiZiNum > hasLaiZiNum {
+				return false, 0
 			}
+			hasLaiZiNum -= needLaiZiNum
 		} else {
-			if maxHeiSanFengNum, bInTable = TableFengWithEye.IsInTableMap(Feng[0], 0); !bInTable {
-				return false, 0, 0, 0
+			maxFengNum, needLaiZiNum, ok = TableFengWithEye.IsInTable(Feng[0])
+			if !ok || needLaiZiNum > hasLaiZiNum {
+				return false, 0
 			}
+			hasLaiZiNum -= needLaiZiNum
 		}
 	}
 
 	for _, num := range XuShu {
-		if _, ok := TableXuShu.IsInTableMap(num, 0); !ok {
-			return false, 0, 0, 0
+		_, needLaiZiNum, ok = TableXuShu.IsInTable(num)
+		if !ok || needLaiZiNum > hasLaiZiNum {
+			continue
 		}
+		hasLaiZiNum -= needLaiZiNum
 	}
 
 	if len(Jian) > 0 {
-		if maxZhongFaBaiNum, bInTable = TableJian.IsInTableMap(Jian[0], 0); !bInTable {
-			return false, 0, 0, 0
+		_, needLaiZiNum, ok := TableJian.IsInTable(Jian[0])
+		if !ok || needLaiZiNum > hasLaiZiNum {
+			return false, 0
 		}
+		hasLaiZiNum -= needLaiZiNum
 	}
 
-	return true, maxHeiSanFengNum + maxZhongFaBaiNum, maxHeiSanFengNum, maxZhongFaBaiNum
+	return true, maxFengNum
 }
 
 func walkThroughTableXuShuJiang(laiziNum int, XuShu []int,
@@ -350,8 +371,14 @@ type slotHandCards struct {
 	laiziNum int
 }
 
+func genFengKeys(slots [TILEMAX]int) int {
+	key := slots[TON]*1000 + slots[NAN]*100 + slots[SHA]*10 + slots[PEI]
+	return key
+}
+
 func genAllPossibleSlotHandCards(handCards []int, laizi []int) (allPossibleSlotHandCards []slotHandCards) {
 
+	fengMap := make(map[int]int)
 	slots := GenSlots(handCards)
 
 	var a slotHandCards
@@ -365,45 +392,55 @@ func genAllPossibleSlotHandCards(handCards []int, laizi []int) (allPossibleSlotH
 		}
 	}
 	allPossibleSlotHandCards = append(allPossibleSlotHandCards, a)
+	fengMap[genFengKeys(a.slots)] = 1
 
-	ret := genFengAsLaiZi(TON, laizi, slots)
+	ret := genFengAsLaiZi(TON, laizi, slots, 0, fengMap)
 	allPossibleSlotHandCards = append(allPossibleSlotHandCards, ret...)
 
 	return
 }
 
-func genFengAsLaiZi(curFeng int, laizi []int, slots [TILEMAX]int) (allPossibleSlotHandCards []slotHandCards) {
+func genFengAsLaiZi(curFeng int, laizi []int, slots [TILEMAX]int, laiziNum int, fengMap map[int]int) (allPossibleSlotHandCards []slotHandCards) {
 	if curFeng > PEI {
 		return
 	}
 
 	if isLaizi(curFeng, laizi) {
 
-		var a slotHandCards
-		for i := 0; i < TILEMAX; i++ {
-			if slots[i] > 0 {
-				if isLaizi(i, laizi) {
-					a.laiziNum += slots[i]
-				} else {
-					a.slots[i] = slots[i]
+		for i := 0; i <= slots[curFeng]; i++ {
+
+			fengNum := i
+			fengAsLaiZiNum := slots[curFeng] - i
+
+			backUpFengNum := slots[curFeng]
+			backUpLaiZiNum := laiziNum
+
+			slots[curFeng] = fengNum
+			laiziNum = laiziNum + fengAsLaiZiNum
+
+			if _, ok := fengMap[genFengKeys(slots)]; !ok {
+				fengMap[genFengKeys(slots)] = 1
+				var a slotHandCards
+				a.laiziNum = laiziNum
+				for j := 0; j < len(slots); j++ {
+					a.slots[j] = slots[j]
+				}
+				allPossibleSlotHandCards = append(allPossibleSlotHandCards, a)
+
+				for k := TON; k <= PEI; k++ {
+					if k != curFeng {
+						ret := genFengAsLaiZi(k, laizi, slots, laiziNum, fengMap)
+						allPossibleSlotHandCards = append(allPossibleSlotHandCards, ret...)
+					}
 				}
 			}
-		}
 
-		for i := 0; i <= slots[curFeng]; i++ {
-			a.slots[curFeng] = i
-			a.laiziNum -= i
-
-			ret := genFengAsLaiZi(curFeng+1, laizi, slots)
-			allPossibleSlotHandCards = append(allPossibleSlotHandCards, a)
-			allPossibleSlotHandCards = append(allPossibleSlotHandCards, ret...)
-
-			a.slots[curFeng] = 0
-			a.laiziNum += i
+			slots[curFeng] = backUpFengNum
+			laiziNum = backUpLaiZiNum
 		}
 
 	} else {
-		ret := genFengAsLaiZi(curFeng+1, laizi, slots)
+		ret := genFengAsLaiZi(curFeng+1, laizi, slots, laiziNum, fengMap)
 		allPossibleSlotHandCards = append(allPossibleSlotHandCards, ret...)
 	}
 

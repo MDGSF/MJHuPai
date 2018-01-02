@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	handCards := []int{1, 2, 3, 27, 27, 28, 28, 29, 29, 30, 30}
-	laizi := []int{1, 2}
+	handCards := []int{27, 27, 27, 28, 28, 28, 29, 29, 29, 31, 31}
+	laizi := []int{27}
 	ok, fengNum := sxtjmj.CanHu(handCards, 1, 27, true, laizi)
 	if !ok {
 		sxtjmj.ShowHandCards(handCards)

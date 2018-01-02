@@ -9,18 +9,61 @@ import (
 type HandCardsList struct {
 	CommonList     []*sxtjmj.PuZi //保存这副牌中，除了黑三风和中发白的其他牌
 	HeiSanFengList []*sxtjmj.PuZi //保存黑三风和中发白
+
+	cardsmap map[int]int
+	cached   bool
+}
+
+func NewHandCardsList() *HandCardsList {
+	handCardList := &HandCardsList{}
+	handCardList.cardsmap = make(map[int]int)
+	handCardList.cached = false
+	return handCardList
+}
+
+func (cardList *HandCardsList) biggerThanZero(card int) bool {
+	if v, ok := cardList.cardsmap[card]; ok {
+		if v > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func (cardList *HandCardsList) commonSub(card int) {
+	if v, ok := cardList.cardsmap[card]; ok {
+		if v > 0 {
+			cardList.cardsmap[card]--
+		}
+	}
+}
+
+func (cardList *HandCardsList) commonAdd(card int) {
+	if _, ok := cardList.cardsmap[card]; ok {
+		cardList.cardsmap[card]++
+	}
 }
 
 func (cardList *HandCardsList) getCommonCards() map[int]int {
-	cardsmap := make(map[int]int)
+
+	if cardList.cached {
+		return cardList.cardsmap
+	}
+
+	cardList.cardsmap = nil
+	cardList.cardsmap = make(map[int]int)
 	for _, v1 := range cardList.CommonList {
 		for _, v2 := range v1.PuZi {
-			if _, ok := cardsmap[v2]; !ok {
-				cardsmap[v2] = 1
+			if _, ok := cardList.cardsmap[v2]; !ok {
+				cardList.cardsmap[v2] = 1
+			} else {
+				cardList.cardsmap[v2]++
 			}
 		}
 	}
-	return cardsmap
+
+	cardList.cached = true
+	return cardList.cardsmap
 }
 
 func (cardList *HandCardsList) addNoFeng(c1 int, c2 int, c3 int) {
@@ -29,6 +72,7 @@ func (cardList *HandCardsList) addNoFeng(c1 int, c2 int, c3 int) {
 	puzi.PuZi[1] = c2
 	puzi.PuZi[2] = c3
 	cardList.CommonList = append(cardList.CommonList, puzi)
+	cardList.cached = false
 }
 
 func (cardList *HandCardsList) removeNoFeng(c1 int, c2 int, c3 int) {
@@ -44,6 +88,7 @@ func (cardList *HandCardsList) removeNoFeng(c1 int, c2 int, c3 int) {
 	if found {
 		cardList.CommonList = append(cardList.CommonList[:index], cardList.CommonList[index+1:]...)
 	}
+	cardList.cached = false
 }
 
 func (cardList *HandCardsList) addFeng(c1 int, c2 int, c3 int) {
@@ -369,14 +414,10 @@ func addToMap(Card int, FengNum int, mymap *map[int]int) {
 
 func analyseCardsList(cardsList *HandCardsList, heiSanFengNum int, tdhvalue *sxtjmj.TdhValue) {
 
-	for _, v := range cardsList.CommonList {
-		addToMap(v.PuZi[0], heiSanFengNum, &(tdhvalue.HuDianPao))
-		addToMap(v.PuZi[1], heiSanFengNum, &(tdhvalue.HuDianPao))
-		addToMap(v.PuZi[2], heiSanFengNum, &(tdhvalue.HuDianPao))
-
-		addToMap(v.PuZi[0], heiSanFengNum, &(tdhvalue.HuZiMo))
-		addToMap(v.PuZi[1], heiSanFengNum, &(tdhvalue.HuZiMo))
-		addToMap(v.PuZi[2], heiSanFengNum, &(tdhvalue.HuZiMo))
+	commonCards := cardsList.getCommonCards()
+	for k := range commonCards {
+		addToMap(k, heiSanFengNum, &(tdhvalue.HuDianPao))
+		addToMap(k, heiSanFengNum, &(tdhvalue.HuZiMo))
 	}
 
 	for _, v := range cardsList.HeiSanFengList {
@@ -394,11 +435,11 @@ func checkAndAddHeiSanFeng(cardsList *HandCardsList, cards []int, iLaiZiNum int,
 	}
 
 	HandCardsMapTemp := curTableTemp[iLaiZiNum]
-	_, exists := (*HandCardsMapTemp)[key]
+	v, exists := (*HandCardsMapTemp)[key]
 	if exists {
-		// if heiSanFengNum <= v.FengNum {
-		// 	return false //这里说明这个情况处理过了，去重。
-		// }
+		if heiSanFengNum <= v.FengNum {
+			return false //这里说明这个情况处理过了，去重。
+		}
 		(*HandCardsMapTemp)[key].FengNum = heiSanFengNum
 	} else {
 		v1 := sxtjmj.NewTdhValue()
@@ -433,6 +474,7 @@ func addToHeiSanFengSub(cardsList *HandCardsList, cards []int, iLaiZiNum int, he
 
 	commonCards := cardsList.getCommonCards()
 	for k := range commonCards {
+		curCard := k
 		k -= sxtjmj.TON
 
 		if k < 0 {
@@ -443,6 +485,11 @@ func addToHeiSanFengSub(cardsList *HandCardsList, cards []int, iLaiZiNum int, he
 			continue
 		}
 
+		if !cardsList.biggerThanZero(curCard) {
+			continue
+		}
+
+		cardsList.commonSub(curCard)
 		cards[k]--
 		if !checkAndAddHeiSanFeng(cardsList, cards, iLaiZiNum, heiSanFengNum) {
 			cards[k]++
@@ -451,24 +498,8 @@ func addToHeiSanFengSub(cardsList *HandCardsList, cards []int, iLaiZiNum int, he
 
 		addToHeiSanFengSub(cardsList, cards, iLaiZiNum+1, heiSanFengNum)
 		cards[k]++
+		cardsList.commonAdd(curCard)
 	}
-
-	// for i := 0; i < curCardsTypeNum; i++ {
-	// 	if cards[i] == 0 {
-	// 		continue
-	// 	}
-
-	// 	//这里需要修改，赖子只能替换cardsList中的CommonList
-	// 	//所以这里需要去遍历CommonList中的每一张牌。
-	// 	cards[i]--
-	// 	if !checkAndAddHeiSanFeng(cardsList, cards, iLaiZiNum, heiSanFengNum) {
-	// 		cards[i]++
-	// 		continue
-	// 	}
-
-	// 	addToHeiSanFengSub(cardsList, cards, iLaiZiNum+1, heiSanFengNum)
-	// 	cards[i]++
-	// }
 }
 
 func addToHeiSanFeng(cardsList *HandCardsList, cards []int, heiSanFengNum int) {
@@ -522,7 +553,7 @@ func genTableFeng() {
 	curTableTemp = &tableFengTemp
 	curCardsTypeNum = 4
 	cards := []int{0, 0, 0, 0}
-	cardsList := &HandCardsList{}
+	cardsList := NewHandCardsList()
 	genHeiSanFengPuZi(cardsList, cards, 1, 0)
 
 	fmt.Println("genTableFeng success")
@@ -536,7 +567,7 @@ func genTableFengWithEye() {
 	curCardsTypeNum = 4
 
 	cards := []int{0, 0, 0, 0}
-	cardsList := &HandCardsList{}
+	cardsList := NewHandCardsList()
 
 	for i := 0; i < curCardsTypeNum; i++ {
 		cards[i] = 2
