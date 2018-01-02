@@ -8,7 +8,8 @@ import (
 
 func Test1(t *testing.T) {
 	handCards := []int{31, 31}
-	if ok, _ := sxtjmj.CanHu(handCards, 1, handCards[0], false, false, false); !ok {
+	laizi := []int{}
+	if ok, _ := sxtjmj.CanHu(handCards, 1, handCards[0], false, laizi); !ok {
 		sxtjmj.ShowHandCards(handCards)
 		t.Error("CanHu failed.")
 	}
@@ -20,7 +21,8 @@ func TestOneJiang(t *testing.T) {
 			handCards := []int{}
 			handCards = append(handCards, int(i))
 			handCards = append(handCards, int(i))
-			if ok, _ := sxtjmj.CanHu(handCards, 1, handCards[0], false, false, false); !ok {
+			laizi := []int{}
+			if ok, _ := sxtjmj.CanHu(handCards, 1, handCards[0], false, laizi); !ok {
 				sxtjmj.ShowHandCards(handCards)
 				t.Error("CanHu failed.")
 			}
@@ -52,7 +54,8 @@ func TestOneJiangWithOnePu(t *testing.T) {
 			handCardsTemp = append(handCardsTemp, int(j))
 			handCardsTemp = append(handCardsTemp, int(j))
 
-			if ok, _ := sxtjmj.CanHu(handCardsTemp, 1, handCards[0], false, false, false); !ok {
+			laizi := []int{}
+			if ok, _ := sxtjmj.CanHu(handCardsTemp, 1, handCards[0], false, laizi); !ok {
 				sxtjmj.ShowHandCards(handCardsTemp)
 				t.Error("CanHu failed.")
 			}
@@ -71,7 +74,8 @@ func TestOneJiangWithOnePu(t *testing.T) {
 			handCardsTemp = append(handCardsTemp, int(j+1))
 			handCardsTemp = append(handCardsTemp, int(j+2))
 
-			if ok, _ := sxtjmj.CanHu(handCardsTemp, 1, handCards[0], false, false, false); !ok {
+			laizi := []int{}
+			if ok, _ := sxtjmj.CanHu(handCardsTemp, 1, handCards[0], false, laizi); !ok {
 				sxtjmj.ShowHandCards(handCardsTemp)
 				t.Error("CanHu failed.")
 			}
@@ -115,7 +119,8 @@ func TestOneJiangWithTwoPu(t *testing.T) {
 					continue
 				}
 
-				if ok, _ := sxtjmj.CanHu(handCardsk, 1, handCards[0], false, false, false); !ok {
+				laizi := []int{}
+				if ok, _ := sxtjmj.CanHu(handCardsk, 1, handCards[0], false, laizi); !ok {
 					sxtjmj.ShowHandCards(handCardsk)
 					t.Error("CanHu failed.")
 				}
@@ -136,7 +141,8 @@ func TestOneJiangWithTwoPu(t *testing.T) {
 					continue
 				}
 
-				if ok, _ := sxtjmj.CanHu(handCardsk, 1, handCards[0], false, false, false); !ok {
+				laizi := []int{}
+				if ok, _ := sxtjmj.CanHu(handCardsk, 1, handCards[0], false, laizi); !ok {
 					sxtjmj.ShowHandCards(handCardsk)
 					t.Error("CanHu failed.")
 				}
@@ -173,7 +179,8 @@ func TestOneJiangWithTwoPu(t *testing.T) {
 					continue
 				}
 
-				if ok, _ := sxtjmj.CanHu(handCardsk, 1, handCards[0], false, false, false); !ok {
+				laizi := []int{}
+				if ok, _ := sxtjmj.CanHu(handCardsk, 1, handCards[0], false, laizi); !ok {
 					sxtjmj.ShowHandCards(handCardsk)
 					t.Error("CanHu failed.")
 				}
@@ -233,7 +240,8 @@ func TestOneJiangWithThreePu(t *testing.T) {
 
 					count++
 
-					if ok, _ := sxtjmj.CanHu(handCards3, 1, handCards[0], false, false, false); !ok {
+					laizi := []int{}
+					if ok, _ := sxtjmj.CanHu(handCards3, 1, handCards[0], false, laizi); !ok {
 						sxtjmj.ShowHandCards(handCards3)
 						t.Error("CanHu failed.")
 					}
@@ -310,7 +318,8 @@ func TestOneJiangWithFourPu(t *testing.T) {
 
 						count++
 
-						if ok, _ := sxtjmj.CanHu(handCards4, 1, handCards[0], false, false, false); !ok {
+						laizi := []int{}
+						if ok, _ := sxtjmj.CanHu(handCards4, 1, handCards[0], false, laizi); !ok {
 							sxtjmj.ShowHandCards(handCards4)
 							t.Error("CanHu failed.")
 						}

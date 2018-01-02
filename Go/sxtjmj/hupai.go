@@ -90,10 +90,8 @@ func CanHu(handCards []int, huType int, huCard int, HeiSanFeng bool, laizi []int
 		// log.Println("ret3 = ", ret3, ", fengNum3 = ", fengNum3, ", heiSanFengNum3 = ", heiSanFengNum3, ", zhongFaBaiNum3 = ", zhongFaBaiNum3)
 	}
 
-	// log.Println("bCanHu = ", bCanHu)
-	// log.Println("maxHeiSanFengNum = ", maxHeiSanFengNum)
-	// log.Println("maxZhongFaBaiNum = ", maxZhongFaBaiNum)
-	// log.Println("maxFengNum = ", maxFengNum)
+	log.Println("bCanHu = ", bCanHu)
+	log.Println("maxFengNum = ", maxFengNum)
 
 	return bCanHu, maxFengNum
 }
