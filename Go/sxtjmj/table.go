@@ -61,7 +61,7 @@ func NewTable() *Table {
 }
 
 //IsInTable 判断num是否在这个表中
-func (table *Table) IsInTable(num int) (int, int, bool) {
+func (table *Table) IsInTable(num int) (fengNum int, laiziNum int, bInTable bool) {
 	for i := 0; i < LaiZiNum; i++ {
 		value, ok := table.IsInTableMap(num, i)
 		if ok {
@@ -80,16 +80,9 @@ func (table *Table) IsInTableMap(num int, iLaiZiNum int) (int, bool) {
 	return 0, false
 }
 
-/*
-IsValid 判断是不是可以胡牌
-num:
-huType: 胡牌类型，1自摸，2点炮。
-huCard: 胡的那张牌，自摸的那张 或者是 点炮的那张。
-*/
-func (table *Table) IsValid(num int, huType int, huCard int) (maxFengNum int, bInTable bool) {
-
+func (table *Table) IsValidMap(num int, huType int, huCard int, iLaiZiNum int) (maxFengNum int, bInTable bool) {
 	//因为推倒胡没有赖子，所以这里直接就查第一张表就好了。
-	value, ok := (*table.Map[0])[num]
+	value, ok := (*table.Map[iLaiZiNum])[num]
 	if !ok {
 		return 0, false
 	}
@@ -110,6 +103,22 @@ func (table *Table) IsValid(num int, huType int, huCard int) (maxFengNum int, bI
 	}
 
 	return 0, false
+}
+
+/*
+IsValid 判断是不是可以胡牌
+num:
+huType: 胡牌类型，1自摸，2点炮。
+huCard: 胡的那张牌，自摸的那张 或者是 点炮的那张。
+*/
+func (table *Table) IsValid(num int, huType int, huCard int) (maxFengNum int, laiziNum int, bInTable bool) {
+	for i := 0; i < LaiZiNum; i++ {
+		value, ok := table.IsValidMap(num, huType, huCard, i)
+		if ok {
+			return value, i, true
+		}
+	}
+	return 0, 0, false
 }
 
 //Load 加载表到内存中

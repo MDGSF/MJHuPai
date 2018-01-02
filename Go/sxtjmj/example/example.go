@@ -7,9 +7,9 @@ import (
 )
 
 func main() {
-	//handCards := []int{0, 0, 31, 31, 31}
-	handCards := []int{27, 27, 28, 28, 29, 29, 30, 30, 31, 31, 31, 31, 32, 33}
-	ok, fengNum := sxtjmj.CanHu(handCards, 1, 27, true, true, false)
+	handCards := []int{1, 2, 3, 27, 27, 28, 28, 29, 29, 30, 30}
+	laizi := []int{1, 2}
+	ok, fengNum := sxtjmj.CanHu(handCards, 1, 27, true, laizi)
 	if !ok {
 		sxtjmj.ShowHandCards(handCards)
 		fmt.Println("error")

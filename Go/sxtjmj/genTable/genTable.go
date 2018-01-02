@@ -152,6 +152,9 @@ func main() {
 	genTableJianKe()
 	genTableJianKeWithEye()
 
+	// genTableFeng()
+	// genTableFengWithEye()
+
 	tableMgr.Dump()
 }
 
@@ -429,19 +432,25 @@ func addToHeiSanFengSub(cardsList *HandCardsList, cards []int, iLaiZiNum int, he
 	}
 
 	commonCards := cardsList.getCommonCards()
-	for _, v := range commonCards {
-		if cards[v] == 0 {
+	for k := range commonCards {
+		k -= sxtjmj.TON
+
+		if k < 0 {
 			continue
 		}
 
-		cards[v]--
+		if cards[k] == 0 {
+			continue
+		}
+
+		cards[k]--
 		if !checkAndAddHeiSanFeng(cardsList, cards, iLaiZiNum, heiSanFengNum) {
-			cards[v]++
+			cards[k]++
 			continue
 		}
 
 		addToHeiSanFengSub(cardsList, cards, iLaiZiNum+1, heiSanFengNum)
-		cards[v]++
+		cards[k]++
 	}
 
 	// for i := 0; i < curCardsTypeNum; i++ {
