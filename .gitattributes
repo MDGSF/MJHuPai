@@ -1,0 +1,2 @@
+*.java linguist-language=go
+*.cpp linguist-language=go
